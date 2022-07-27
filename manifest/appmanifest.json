@@ -1,0 +1,28 @@
+{
+  "name": "grrd's Reversi",
+  "short_name": "Reversi",
+  "version": "1.0",
+  "description": "grrd's Reversi is a HTML5 game for your smartphone or computer. \nPlace your stone so that at least one of your opponent's stones is flanked by your stones. \nAll of your opponent's stones between your pieces are then flipped over to become your color. \nThe object of the game is to own more stones than your opponent when the game is over.\nYou can play against the computer or against another player.\nIt even works offline. ",
+  "default_locale": "en",
+  "icons": [
+    {
+      "src": "../images/icon.svg",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "../images/screenshots/grrdsreversi1.png",
+      "type": "image/png",
+      "sizes": "750x1334"
+    }
+  ],
+  "categories": ["games", "logic games", "casual games", "family games"],
+  "background_color": "#444",
+  "theme_color": "#444",
+  "display": "standalone",
+  "start_url": "../index.html",
+  "author": "Gerard Tyedmers"
+}
