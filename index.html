@@ -57,7 +57,7 @@
                 <div class="popup-head">
                     <img class="w100" src="images/title.png" alt="grrd's Reversi">
                 </div>
-                <div id="iInfoBody" class="popup-body">
+                <div class="popup-body">
                     <p id="lInstr" class="popup-content">Place your stone so that at least one of your opponent's stones is flanked by your stones.
                         All of your opponent's stones between your pieces are then flipped over to become your color.
                         The object of the game is to own more stones than your opponent when the game is over.</p>
@@ -98,12 +98,35 @@
             </div>
             <div class="buffer"></div>
         </div>
+        <div id="iPopupSettings" class="overflow popup-init">
+            <div class="popup">
+                <div class="popup-head">
+                    <img class="w100" src="images/title.png" alt="grrd's Reversi">
+                </div>
+                <div class="popup-body">
+                    <div class="popup-content">
+                        <span>Show possible moves</span>
+                        <div class="fr">
+                            <input class="tgl tgl-skewed" id="iShowMoves" type="checkbox" checked="checked"/>
+                            <label class="tgl-btn" data-tg-off="OFF" data-tg-on="ON" for="iShowMoves"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup-footer">
+                    <button id="iSettingsClose" class="button">
+                        <span class="button-span"><img class="w25 shadow" src="images/ok.svg" alt="OK">&nbsp;OK</span>
+                    </button>
+                </div>
+            </div>
+            <div class="buffer"></div>
+        </div>
     </main>
     <div class="page" id="iGame">
         <div id="message"></div>
         <button id="iClose" class="close-button">
             <img class="" src="images/x.svg" alt="close">
         </button>
+        <div id="background"></div>
         <div id="playground"></div>
     </div>
 
