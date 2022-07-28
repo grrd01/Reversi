@@ -13,7 +13,7 @@
     // Spieler, welcher am Zug ist (0/1)
     let nCurrentPlayer = 0;
     // Modus des Spiels: human, easy, medium, hard, online
-    let cModus;
+    let cModus = [];
     // Array der Farben der beiden Spieler
     const lColor = ["black","white"];
     // Element mit der übergebenen ID zurückgeben
@@ -22,16 +22,24 @@
     };
     // Spielfeld-Element mit allen Feldern als Children
     const oPlayground = $("playground");
+    // Hintergrund für Markierungen
+    const oBackground = $("background");
     // Nachricht
     const oMessage = $("message")
+
+    // mögliche Spielzüge anzeigen
+    let bShowMoves = true;
 
     /**
      * Spielfeld zurücksetzen, damit ein neues Spiel möglich wird
      */
     function fResetGame () {
-        let lPossibleMovesID = [];
+        let lPossibleMoves;
         for (const oStone of oPlayground.children) {
             oStone.className = "empty";
+        }
+        for (const oStone of oBackground.children) {
+            oStone.className = "";
         }
         oPlayground.children[27].className = lColor[0];
         oPlayground.children[36].className = lColor[0];
@@ -39,8 +47,17 @@
         oPlayground.children[35].className = lColor[1];
 
         nCurrentPlayer = 0;
-        fPossibleMoves(fCurrentPlayground ()).forEach(oMove => {lPossibleMovesID.push(oMove.nID)})
-        oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + "). Possible moves: " + lPossibleMovesID);
+        lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
+        oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + " begins (" + lColor[nCurrentPlayer] + ").");
+
+                if (cModus[nCurrentPlayer] !== "human") {
+            fAI(lPossibleMoves)
+        } else if (bShowMoves) {
+            for (const oPossibleMove of lPossibleMoves) {
+                oBackground.children[oPossibleMove.nID].className = "ok";
+            }
+        }
+
     }
 
     /**
@@ -48,7 +65,8 @@
      * @param {event} event - Click-Event auf einen der Buttons [human, easy, medium, hard]
      */
     function fStartGame(event) {
-        cModus = event.target.getAttribute("data-player2");
+        cModus[0] = "human"; // todo: switch [ human ] to [ easy medium hard ] for testing
+        cModus[1] = event.target.getAttribute("data-player2");
         fResetGame();
         iTitle.classList.remove("swipe-out-right");
         iGame.classList.remove("swipe-in-left");
@@ -148,12 +166,20 @@
         let nStoneID = Array.prototype.indexOf.call(oStone.parentNode.children, oStone);
         let lPlayground = fCurrentPlayground();
         let lPossibleMoves = [];
-        let lPossibleMovesID = [];
         const lStonesCaptured = fCheckStones(nStoneID, lPlayground);
+
+        for (const oStone of oBackground.getElementsByClassName("wrong")) {
+            oStone.className = "";
+        }
+
         if (lStonesCaptured.length > 0) {
             // eingeklemmte Steine drehen
             for (const nStoneCaptured of lStonesCaptured) {
                 oPlayground.children[nStoneCaptured].className = lColor[nCurrentPlayer];
+            }
+            // Markierungen löschen
+            for (const oStone of oBackground.children) {
+                oStone.className = "";
             }
             if (document.getElementsByClassName("empty").length === 0) {
                 // alle Felder besetzt, Spiel beendet
@@ -164,21 +190,27 @@
                 lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
                 if (lPossibleMoves.length > 0) {
                     // nächster Spieler kann spielen
-                    lPossibleMoves.forEach(oPossibleMove => {lPossibleMovesID.push(oPossibleMove.nID)})
-                    oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + "). Possible moves: " + lPossibleMovesID);
-                    if (cModus !== "human" && nCurrentPlayer === 1) {
+                    oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + ").");
+                    if (cModus[nCurrentPlayer] !== "human") {
                         fAI(lPossibleMoves)
+                    } else if (bShowMoves) {
+                        for (const oPossibleMove of lPossibleMoves) {
+                            oBackground.children[oPossibleMove.nID].className = "ok";
+                        }
                     }
                 } else {
                     nCurrentPlayer = 1 - nCurrentPlayer;
                     lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
                     if (lPossibleMoves.length > 0) {
                         // nächster Spieler kann nicht spielen und wird übersprungen
-                        lPossibleMoves.forEach(oPossibleMove => {lPossibleMovesID.push(oPossibleMove.nID)})
                         oMessage.innerHTML = ("Player " + (1 - nCurrentPlayer) + " can't move." +
-                            "Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + "). Possible moves: " + lPossibleMovesID);
-                        if (cModus !== "human" && nCurrentPlayer === 1) {
+                            "Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + ").");
+                        if (cModus[nCurrentPlayer] !== "human") {
                             fAI(lPossibleMoves)
+                        } else if (bShowMoves) {
+                            for (const oPossibleMove of lPossibleMoves) {
+                                oBackground.children[oPossibleMove.nID].className = "ok";
+                            }
                         }
                     } else {
                         // kein Spieler kann mehr spielen, Spiel beendet
@@ -188,7 +220,7 @@
             }
         } else {
             oMessage.innerHTML = ("you can't play here");
-        }
+            oBackground.children[nStoneID].className = "wrong";        }
     }
 
     /**
@@ -203,9 +235,14 @@
      */
     function fAIScore (lPossibleMoves, lPlayground) {
         const lDirections = [[0,1],[1,0],[1,1],[1,-1]];
+        const lBorderStones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63]
 
         for (const oPossibleMove of lPossibleMoves) {
+            // jeder gewonnene Stein ergibt einen Punkt
             oPossibleMove.nScore = oPossibleMove.lStones.length;
+            // Steine am Rand bekommen zusätzliche 4 Punkte
+            oPossibleMove.nScore += oPossibleMove.lStones.filter(nStone => lBorderStones.includes(nStone)).length * 4;
+
             // Spielfeld nach dem möglichen Zug ablegen
             oPossibleMove.lPlayground = [...lPlayground];
             oPossibleMove.lStones.forEach(nStone => {
@@ -213,12 +250,14 @@
             });
 
             oPossibleMove.lPossibleGemstones = [];
+            oPossibleMove.lPossibleGemstonesNeighbours = [];
             for (const [nIndex, oStone] of oPossibleMove.lPlayground.entries()){
                 // Loop durch alle Steine
                 // Welche steine nach dem Spielzug kann mir keiner mehr nehmen? Wieviele davon sind in der Liste der zu gewinnenden Steine bei diesem Zug?
                 // todo: es reicht nicht, zu prüfen ob ein gegnerischer Stein links oder rechts ist, es braucht auf der anderen Seite auch ein leeres Feld, dass der Stein nicht sicher ist
 
                 let nDirOK = 0;
+                let lNeighbours = [];
                 for (const lDirection of lDirections){
                     // Loop durch alle Richtungen
                     // Falls alle (links oder rechts von mir) und (über oder unter mir) mir gehören, ist Stein sicher
@@ -228,16 +267,24 @@
                     for (let nIndex2 = 1; nIndex2 <= 7; nIndex2++) {
                         if (0 <= nIndex + nIndex2 * lDirection[0] * 8 + nIndex2 * lDirection[1]
                             &&  nIndex + nIndex2 * lDirection[0] * 8 + nIndex2 * lDirection[1] <= 63
-                            && Math.floor(nIndex/8) === Math.floor((nIndex + nIndex2 * lDirection[1]) / 8)
-                            && oPossibleMove.lPlayground[nIndex + nIndex2 * lDirection[0] * 8 + nIndex2 * lDirection[1]] !== lColor[nCurrentPlayer]) {
-                            bLeftOK = false;
+                            && Math.floor(nIndex/8) === Math.floor((nIndex + nIndex2 * lDirection[1]) / 8)) {
+                            if (oPossibleMove.lPlayground[nIndex + nIndex2 * lDirection[0] * 8 + nIndex2 * lDirection[1]] !== lColor[nCurrentPlayer]) {
+                                bLeftOK = false;
+                            }
+                            if (nIndex2 === 1) {
+                                lNeighbours.push(nIndex + lDirection[0] * 8 + lDirection[1]);
+                            }
+
                         }
                         if (0 <= nIndex + nIndex2 * (-1) * lDirection[0] * 8 + nIndex2 * (-1) * lDirection[1]
                             && nIndex + nIndex2 * (-1) * lDirection[0] * 8 + nIndex2 * (-1) * lDirection[1] <= 63
-                            && Math.floor(nIndex/8) === Math.floor((nIndex + nIndex2 * (-1) * lDirection[1]) / 8)
-                            && oPossibleMove.lPlayground    [nIndex + nIndex2 * (-1) * lDirection[0] * 8 + nIndex2 * (-1) * lDirection[1]] !== lColor[nCurrentPlayer]
-                        ) {
-                            bRightOK = false;
+                            && Math.floor(nIndex/8) === Math.floor((nIndex + nIndex2 * (-1) * lDirection[1]) / 8)) {
+                            if (oPossibleMove.lPlayground[nIndex + nIndex2 * (-1) * lDirection[0] * 8 + nIndex2 * (-1) * lDirection[1]] !== lColor[nCurrentPlayer]) {
+                                bRightOK = false;
+                            }
+                            if (nIndex2 === 1) {
+                                lNeighbours.push(nIndex + (-1) * lDirection[0] * 8 + (-1) * lDirection[1]);
+                            }
                         }
                     }
                     if (bLeftOK ||  bRightOK) {
@@ -246,6 +293,7 @@
                 }
                 if (nDirOK ===  lDirections.length) {
                     oPossibleMove.lPossibleGemstones.push(nIndex);
+                    oPossibleMove.lPossibleGemstonesNeighbours = oPossibleMove.lPossibleGemstonesNeighbours.concat(lNeighbours);
                 }
 
             }
@@ -253,6 +301,10 @@
             // Steine, welche nicht mehr verloren werden können
             oPossibleMove.lGemstones = oPossibleMove.lStones.filter(nStone => oPossibleMove.lPossibleGemstones.includes(nStone));
             oPossibleMove.nScore += oPossibleMove.lGemstones.length * 100;
+            // Nachbarn von Steinen, welche nicht mehr verloren werden können, sind weniger cool
+            if (oPossibleMove.lGemstones.length === 0) {
+                oPossibleMove.nScore -= oPossibleMove.lStones.filter(nStone => oPossibleMove.lPossibleGemstonesNeighbours.includes(nStone)).length * 50;
+            }
         }
         return lPossibleMoves;
     }
@@ -285,6 +337,7 @@
                     oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer = fPossibleMoves(oPossibleMoves.lPossibleMovesOpponent[0].lPlayground);
                     if (oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer.length > 0) {
                         oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer = fAIScore(oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer, oPossibleMoves.lPossibleMovesOpponent[0].lPlayground);
+                        oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer.sort((a,b) =>  b.nScore - a.nScore);
                         oPossibleMoves.nScore = oPossibleMoves.nScore + oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer[0].nScore * 0.8;
                     }
                     nCurrentPlayer = 1 - nCurrentPlayer;
@@ -297,15 +350,19 @@
 
         // Wieviele Möglichkeiten mit maximalem Score gibt es?
         let nMaxScore = lPossibleMoves[0].nScore;
-        if (cModus !== "hard") {
-            // zweithöchsten Wert für Medium
+        if (cModus[nCurrentPlayer] !== "hard") {
+            // zweithöchsten Wert
             nMaxScore = (lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore < nMaxScore)[0] ?? lPossibleMoves[0]).nScore;
         }
-        if (cModus === "easy") {
-            //dritthöchsten Wert für Easy
+        if (cModus[nCurrentPlayer] === "medium") {
+            //dritthöchsten Wert für Medium
             nMaxScore = (lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore < nMaxScore)[0] ?? lPossibleMoves[lPossibleMoves.length - 1]).nScore;
         }
-        console.log(cModus + " - Max: " + nMaxScore + " (" + lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length + "/" + lPossibleMoves.length + " possible Moves)");
+        if (cModus[nCurrentPlayer] === "easy") {
+            //tiefsten Wert für Easy
+            nMaxScore = lPossibleMoves[lPossibleMoves.length - 1].nScore;
+        }
+        console.log(cModus[nCurrentPlayer] + " - Max: " + nMaxScore + " (" + lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length + "/" + lPossibleMoves.length + " possible Moves)");
 
         const nCount = lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length;
         // Davon eine wählen
@@ -323,7 +380,7 @@
      */
     function fClickHandler(oStone) {
         return function () {
-            if (nCurrentPlayer === 0 || cModus === "human") {
+            if (cModus[nCurrentPlayer] === "human") {
                 fClickStone(oStone);
             }
 
@@ -331,24 +388,24 @@
     }
 
     /**
-     * Popup Info einblenden
+     * Popup einblenden
      */
-    function fShowPopupInfo() {
+    function fShowPopup(ePopup) {
         $("iTitleFieldset").disabled = true;
         // Fix for Firefox OnKeydown
         document.activeElement.blur();
-        iPopupInfo.classList.remove("popup-init");
-        iPopupInfo.classList.remove("popup-hide");
-        iPopupInfo.classList.add("popup-show");
+        ePopup.classList.remove("popup-init");
+        ePopup.classList.remove("popup-hide");
+        ePopup.classList.add("popup-show");
     }
 
     /**
-     * Popup Info ausblenden
+     * Popup ausblenden
      */
-    function fHidePopupInfo() {
+    function fHidePopup(ePopup) {
         $("iTitleFieldset").disabled = false;
-        iPopupInfo.classList.remove("popup-show");
-        iPopupInfo.classList.add("popup-hide");
+        ePopup.classList.remove("popup-show");
+        ePopup.classList.add("popup-hide");
     }
 
     /**
@@ -366,8 +423,21 @@
             });
         }
 
-        $("iInfo").addEventListener("click", fShowPopupInfo);
-        $("iInfoClose").addEventListener("click", fHidePopupInfo);
+        $("iInfo").addEventListener("click", function () {
+            fShowPopup($("iPopupInfo"));
+        });
+        $("iInfoClose").addEventListener("click", function () {
+            fHidePopup($("iPopupInfo"));
+        });
+
+
+        $("iSettings").addEventListener("click", function () {
+            fShowPopup($("iPopupSettings"));
+        });
+        $("iSettingsClose").addEventListener("click", function () {
+            bShowMoves = $("iShowMoves").checked;
+            fHidePopup($("iPopupSettings"));
+        });
 
         Array.from(document.getElementsByClassName("list-button")).forEach(function (rButton) {
             rButton.addEventListener("click", fStartGame);
@@ -381,10 +451,11 @@
         // Grid für eigene Bilder aufbauen
         for (nIndex = 0; nIndex < 64; nIndex += 1) {
             oStone = document.createElement("div");
+            //oStone.innerHTML = nIndex; //todo: remove before flight
             oPlayground.appendChild(oStone);
             oStone.onclick = fClickHandler(oStone);
+            oBackground.appendChild(document.createElement("div"));
         }
-        fResetGame();
     }
 
     fInit();
