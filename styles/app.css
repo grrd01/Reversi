@@ -242,6 +242,9 @@ nav, .mini-buttonlist, .close-button {
 .close-button img {
     width: 28px;
 }
+.close-button:active img {
+    margin-bottom: -2px;
+}
 
 .flex-right {
     align-self: flex-start;
@@ -370,6 +373,7 @@ nav, .mini-buttonlist, .close-button {
 
 .w25 {
     width: 30px;
+    margin-bottom: -10px;
 }
 
 .w100 {
@@ -381,16 +385,17 @@ nav, .mini-buttonlist, .close-button {
 }
 
 a:link {
-    color: #40C4FF;
+    color: #FC9B00;
+    transition: color 0.3s ease;
 }
 a:visited {
-    color: #00B0FF;
+    color: #DE5B00;
 }
 a:hover, a:focus {
-    color: #80D8FF;
+    color: #FDC400;
 }
 a:active {
-    color: #80D8FF;
+    color: #FDC400;
 }
 
 .shadow {
@@ -400,7 +405,8 @@ a:active {
 .button {
     border: 1px transparent;
     border-radius: 10px;
-    background-image: linear-gradient(#26C6DA, #006064), linear-gradient(#80DEEA, #00ACC1 12px, #00838F 100%);
+    background-image: linear-gradient(#FFA100, #bb1000),
+    linear-gradient(#FFD900, #F42F00 12px, #820f04 100%);
     background-origin: border-box;
     background-clip: content-box, border-box;
     padding: 1px;
@@ -412,10 +418,12 @@ a:active {
     font-weight: bold;
 }
 .button:hover, .button:focus {
-    background-image: linear-gradient(#51d1e1, #009499), linear-gradient(#a7e8f1, #00cbe6 12px, #00a4b3 100%);
+    background-image: linear-gradient(#ffb300, #bb2c00),
+    linear-gradient(#fce768, #f45900 12px, #941205 100%);
 }
 .button:active {
-    background-image: linear-gradient(#1e9eae, #004a4d), linear-gradient(#65d7e6, #008799 calc(100% - 12px), #005e66 100%);;
+    background-image: linear-gradient(#f08c00, #ab0000),
+    linear-gradient(#edba00, #db1d00 12px, #5e0c04 100%);
 }
 .button:disabled {
     background-image: linear-gradient(#d4d4d4, #535454),
@@ -541,38 +549,41 @@ nav, .mini-buttonlist, .close-button {
     }
 }
 
-
-#playground, #background {
+#iPlayground {
     width: 100vmin;
     height: 100vmin;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
     grid-auto-rows: 1fr;
-    position: absolute;
-    top: 0;
-    left: 0;
  }
 
-#playground > div, #background > div {
+#iPlayground > div {
  overflow: hidden;
 }
 
-#playground > div.empty::after {
+#iPlayground > div.empty::after {
     content: url("../images/stone_empty.svg");
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
 }
-#playground > div.black::after {
+#iPlayground > div.black::after {
     content: url("../images/stone_black.svg");
 }
-#playground > div.white::after {
+#iPlayground > div.white::after {
     content: url("../images/stone_white.svg");
 }
 
-#background > div.ok::after {
-    content: url("../images/stone_ok.svg");
+#iPlayground > div.ok::after {
+    filter: grayscale(100%) brightness(80%) sepia(300%) hue-rotate(108deg) saturate(500%);
+    cursor: pointer;
 }
-#background > div.wrong::after {
-    content: url("../images/stone_wrong.svg");
+#iPlayground > div.empty.ok:hover::after {
+    opacity: 0.2;
+}
+
+#iPlayground > div.wrong::after {
+    filter: grayscale(100%) brightness(50%) sepia(100%) hue-rotate(300deg) saturate(900%) contrast(1);
 }
 
 /* Toggle-Button */
@@ -659,8 +670,8 @@ nav, .mini-buttonlist, .close-button {
     left: -10%;
 }
 .tgl-skewed:checked + .tgl-btn {
-    background-image: linear-gradient(#9999ff, #6666ff),
-    linear-gradient(#e6e6ff, #6666ff 12px, #00004d 100%);
+    background-image: linear-gradient(#FFA100, #bb1000),
+    linear-gradient(#FFD900, #F42F00 12px, #820f04 100%);
 }
 .tgl-skewed:checked + .tgl-btn:before {
     left: -100%;
@@ -672,8 +683,8 @@ nav, .mini-buttonlist, .close-button {
     left: 10%;
 }
 .tgl-skewed:checked:hover + .tgl-btn, .tgl-skewed:checked:focus + .tgl-btn {
-    background-image: linear-gradient(#b3b3ff, #7c7cff),
-    linear-gradient(#ffffff, #7c7cff 12px, #000080 100%);
+    background-image: linear-gradient(#ffb300, #bb2c00),
+    linear-gradient(#fce768, #f45900 12px, #941205 100%);
 }
 .tgl-skewed:not(:checked):hover + .tgl-btn, .tgl-skewed:not(:checked):focus + .tgl-btn {
     background: linear-gradient(#bbb, #666),
@@ -682,8 +693,14 @@ nav, .mini-buttonlist, .close-button {
 
 /*todo: Temp - remove before flight*/
 
-#message {
+#iMessage {
     position: absolute;
     bottom: 20px;
+    left: 20px;
+}
+
+#iScore {
+    position: absolute;
+    bottom: 60px;
     left: 20px;
 }

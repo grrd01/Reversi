@@ -16,16 +16,16 @@
     let cModus = [];
     // Array der Farben der beiden Spieler
     const lColor = ["black","white"];
+    // Array der Stein-Bilder der beiden Spieler
+    const lStoneImg = ["<img class='w25' src='images/stone_black.svg' alt='Black'>", "<img class='w25' src='images/stone_white.svg' alt='White'>"]
     // Element mit der übergebenen ID zurückgeben
     const $ = function (oID) {
         return document.getElementById(oID);
     };
     // Spielfeld-Element mit allen Feldern als Children
-    const oPlayground = $("playground");
-    // Hintergrund für Markierungen
-    const oBackground = $("background");
+    const oPlayground = $("iPlayground");
     // Nachricht
-    const oMessage = $("message")
+    const oMessage = $("iMessage")
 
     // mögliche Spielzüge anzeigen
     let bShowMoves = true;
@@ -38,9 +38,6 @@
         for (const oStone of oPlayground.children) {
             oStone.className = "empty";
         }
-        for (const oStone of oBackground.children) {
-            oStone.className = "";
-        }
         oPlayground.children[27].className = lColor[0];
         oPlayground.children[36].className = lColor[0];
         oPlayground.children[28].className = lColor[1];
@@ -48,13 +45,13 @@
 
         nCurrentPlayer = 0;
         lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
-        oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + " begins (" + lColor[nCurrentPlayer] + ").");
+        oMessage.innerHTML = lStoneImg[nCurrentPlayer] + " begins.";
 
-                if (cModus[nCurrentPlayer] !== "human") {
+        if (cModus[nCurrentPlayer] !== "human") {
             fAI(lPossibleMoves)
         } else if (bShowMoves) {
             for (const oPossibleMove of lPossibleMoves) {
-                oBackground.children[oPossibleMove.nID].className = "ok";
+                oPlayground.children[oPossibleMove.nID].classList.add("ok");
             }
         }
 
@@ -96,7 +93,7 @@
         let lStonesCaptured = [];
         if (lPlayground[nStoneID] !== "empty") {
             // kein leeres Feld
-            oMessage.innerHTML = ("field already taken");
+            oMessage.innerHTML = "Field already taken";
             return lStonesCaptured;
         }
         for (const lDirection of lDirections){
@@ -131,7 +128,7 @@
     function fCurrentPlayground () {
         let lPlayground = [];
         for (const oStone of oPlayground.children) {
-            lPlayground.push(oStone.className);
+            lPlayground.push(oStone.classList.contains(lColor[0]) ? lColor[0] : (oStone.classList.contains(lColor[1]) ? lColor[1] : "empty"));
         }
         return lPlayground;
     }
@@ -168,8 +165,8 @@
         let lPossibleMoves = [];
         const lStonesCaptured = fCheckStones(nStoneID, lPlayground);
 
-        for (const oStone of oBackground.getElementsByClassName("wrong")) {
-            oStone.className = "";
+        for (const oStone of oPlayground.getElementsByClassName("wrong")) {
+            oStone.classList.remove("wrong");
         }
 
         if (lStonesCaptured.length > 0) {
@@ -178,24 +175,31 @@
                 oPlayground.children[nStoneCaptured].className = lColor[nCurrentPlayer];
             }
             // Markierungen löschen
-            for (const oStone of oBackground.children) {
-                oStone.className = "";
+            for (const oStone of oPlayground.children) {
+                oStone.classList.remove("ok");
             }
             if (document.getElementsByClassName("empty").length === 0) {
                 // alle Felder besetzt, Spiel beendet
-                oMessage.innerHTML = ("Game over. White " + document.getElementsByClassName("white").length + ", Black " + document.getElementsByClassName("black").length);
+                oMessage.innerHTML = "Game over. ";
+                if (document.getElementsByClassName(lColor[0]).length > document.getElementsByClassName(lColor[1]).length) {
+                    oMessage.innerHTML += lStoneImg[0] + " wins!";
+                } else if (document.getElementsByClassName(lColor[0]).length < document.getElementsByClassName(lColor[1]).length) {
+                    oMessage.innerHTML += lStoneImg[1] + " wins!";
+                } else {
+                    oMessage.innerHTML += " It's a draw!";
+                }
             } else {
                 // nächster Spieler dran
                 nCurrentPlayer = 1 - nCurrentPlayer;
                 lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
                 if (lPossibleMoves.length > 0) {
                     // nächster Spieler kann spielen
-                    oMessage.innerHTML = ("Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + ").");
+                    oMessage.innerHTML = lStoneImg[nCurrentPlayer] +  "'s turn.";
                     if (cModus[nCurrentPlayer] !== "human") {
                         fAI(lPossibleMoves)
                     } else if (bShowMoves) {
                         for (const oPossibleMove of lPossibleMoves) {
-                            oBackground.children[oPossibleMove.nID].className = "ok";
+                            oPlayground.children[oPossibleMove.nID].classList.add("ok");
                         }
                     }
                 } else {
@@ -203,24 +207,33 @@
                     lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
                     if (lPossibleMoves.length > 0) {
                         // nächster Spieler kann nicht spielen und wird übersprungen
-                        oMessage.innerHTML = ("Player " + (1 - nCurrentPlayer) + " can't move." +
-                            "Player " + (nCurrentPlayer + 1) + "'s turn (" + lColor[nCurrentPlayer] + ").");
+                        oMessage.innerHTML = lStoneImg[1 - nCurrentPlayer] + " can't move. " +
+                            lStoneImg[nCurrentPlayer] + "'s turn. ";
                         if (cModus[nCurrentPlayer] !== "human") {
                             fAI(lPossibleMoves)
                         } else if (bShowMoves) {
                             for (const oPossibleMove of lPossibleMoves) {
-                                oBackground.children[oPossibleMove.nID].className = "ok";
+                                oPlayground.children[oPossibleMove.nID].classList.add("ok");
                             }
                         }
                     } else {
                         // kein Spieler kann mehr spielen, Spiel beendet
-                        oMessage.innerHTML = ("Game over, no player can move. White " + document.getElementsByClassName("white").length + ", Black " + document.getElementsByClassName("black").length)
+                        oMessage.innerHTML = "Game over, no player can move. ";
+                        if (document.getElementsByClassName(lColor[0]).length > document.getElementsByClassName(lColor[1]).length) {
+                            oMessage.innerHTML += lStoneImg[0] + " wins!";
+                        } else if (document.getElementsByClassName(lColor[0]).length < document.getElementsByClassName(lColor[1]).length) {
+                            oMessage.innerHTML += lStoneImg[1] + " wins!";
+                        } else {
+                            oMessage.innerHTML += " It's a draw!";
+                        }
                     }
                 }
             }
         } else {
-            oMessage.innerHTML = ("you can't play here");
-            oBackground.children[nStoneID].className = "wrong";        }
+            oMessage.innerHTML = lStoneImg[nCurrentPlayer] + " can't play here.";
+            oPlayground.children[nStoneID].classList.add("wrong");
+        }
+        $("iScore").innerHTML = lStoneImg[0] + ": " + document.getElementsByClassName(lColor[0]).length + " - " + lStoneImg[1] + ": " + document.getElementsByClassName(lColor[1]).length;
     }
 
     /**
@@ -235,13 +248,16 @@
      */
     function fAIScore (lPossibleMoves, lPlayground) {
         const lDirections = [[0,1],[1,0],[1,1],[1,-1]];
-        const lBorderStones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63]
+        const lBorderStones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63];
+        const lPreBorderStones = [9, 10, 11, 12, 13, 14, 17, 22, 25, 30, 33, 38, 41, 46, 49, 50, 51, 52, 53, 54];
 
         for (const oPossibleMove of lPossibleMoves) {
             // jeder gewonnene Stein ergibt einen Punkt
             oPossibleMove.nScore = oPossibleMove.lStones.length;
             // Steine am Rand bekommen zusätzliche 4 Punkte
             oPossibleMove.nScore += oPossibleMove.lStones.filter(nStone => lBorderStones.includes(nStone)).length * 4;
+            // Steine vor dem Rand verlieren die Hälfte
+            oPossibleMove.nScore -= oPossibleMove.lStones.filter(nStone => lPreBorderStones.includes(nStone)).length * 0.5;
 
             // Spielfeld nach dem möglichen Zug ablegen
             oPossibleMove.lPlayground = [...lPlayground];
@@ -331,14 +347,14 @@
                 } else {
                     oPossibleMoves.lPossibleMovesOpponent = fAIScore(oPossibleMoves.lPossibleMovesOpponent, oPossibleMoves.lPlayground);
                     oPossibleMoves.lPossibleMovesOpponent.sort((a,b) =>  b.nScore - a.nScore);
-                    oPossibleMoves.nScore = oPossibleMoves.nScore - oPossibleMoves.lPossibleMovesOpponent[0].nScore * 0.9;
+                    oPossibleMoves.nScore = oPossibleMoves.nScore - oPossibleMoves.lPossibleMovesOpponent[0].nScore * 0.8;
                     // Score des übernächsten Zuges des Spielers dazuzählen
                     nCurrentPlayer = 1 - nCurrentPlayer;
                     oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer = fPossibleMoves(oPossibleMoves.lPossibleMovesOpponent[0].lPlayground);
                     if (oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer.length > 0) {
                         oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer = fAIScore(oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer, oPossibleMoves.lPossibleMovesOpponent[0].lPlayground);
                         oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer.sort((a,b) =>  b.nScore - a.nScore);
-                        oPossibleMoves.nScore = oPossibleMoves.nScore + oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer[0].nScore * 0.8;
+                        oPossibleMoves.nScore = oPossibleMoves.nScore + oPossibleMoves.lPossibleMovesOpponent[0].lPossibleMovesPlayer[0].nScore * 0.6;
                     }
                     nCurrentPlayer = 1 - nCurrentPlayer;
                 }
@@ -454,7 +470,6 @@
             //oStone.innerHTML = nIndex; //todo: remove before flight
             oPlayground.appendChild(oStone);
             oStone.onclick = fClickHandler(oStone);
-            oBackground.appendChild(document.createElement("div"));
         }
     }
 
