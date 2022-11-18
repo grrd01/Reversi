@@ -51,6 +51,29 @@ header .title1 {
     min-width: calc(55px / 9 * 49);
 }
 
+.eBlack, .eWhite {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.eWhite {
+    transform: rotate(180deg);
+}
+
+.vanish {
+    opacity: 0;
+    transform: rotate(180deg) translate(20px,-33px) scale(80%);
+}
+.vanishWhite {
+    opacity: 0;
+    transform: rotate(0deg) translate(-20px, -33px) scale(80%);
+}
+
+svg text {
+    text-shadow: none;
+}
+
 fieldset {
     padding: 0;
     margin: 0;
@@ -172,7 +195,7 @@ button > span {
     font-size: large;
 }
 
-button:focus {
+button:focus, select:focus {
     outline: none;
 }
 
@@ -233,14 +256,17 @@ nav, .mini-buttonlist, .close-button {
 
 .close-button {
     border-radius: 20px;
-    width: 32px;
-    height: 32px;
+    width: 27px;
+    height: 27px;
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
 }
 .close-button img {
-    width: 28px;
+    width: 23px;
+}
+.close-button:active img {
+    margin-bottom: -2px;
 }
 
 .flex-right {
@@ -326,10 +352,13 @@ nav, .mini-buttonlist, .close-button {
 }
 .popup-content {
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }
 .popup-footer {
-    height: 50px;
     margin: 15px;
+    padding-top: 5px;
     display: flex;
     flex-direction: row-reverse;
     justify-content: space-between;
@@ -370,27 +399,34 @@ nav, .mini-buttonlist, .close-button {
 
 .w25 {
     width: 30px;
+    margin-bottom: -10px;
 }
 
 .w100 {
     width: 100%;
 }
 
+.w30 {
+    width: 30px;
+    margin-right: 10px;
+}
+
 .fr {
-    float: right;
+    margin-left: auto;
 }
 
 a:link {
-    color: #40C4FF;
+    color: #FC9B00;
+    transition: color 0.3s ease;
 }
 a:visited {
-    color: #00B0FF;
+    color: #DE5B00;
 }
 a:hover, a:focus {
-    color: #80D8FF;
+    color: #FDC400;
 }
 a:active {
-    color: #80D8FF;
+    color: #FDC400;
 }
 
 .shadow {
@@ -400,22 +436,24 @@ a:active {
 .button {
     border: 1px transparent;
     border-radius: 10px;
-    background-image: linear-gradient(#26C6DA, #006064), linear-gradient(#80DEEA, #00ACC1 12px, #00838F 100%);
+    background-image: linear-gradient(#FFA100, #bb1000),
+    linear-gradient(#FFD900, #F42F00 12px, #820f04 100%);
     background-origin: border-box;
     background-clip: content-box, border-box;
     padding: 1px;
     height: 42px;
     width: 121px;
-    margin: 5px;
     cursor: pointer;
     text-align: center;
     font-weight: bold;
 }
 .button:hover, .button:focus {
-    background-image: linear-gradient(#51d1e1, #009499), linear-gradient(#a7e8f1, #00cbe6 12px, #00a4b3 100%);
+    background-image: linear-gradient(#ffb300, #bb2c00),
+    linear-gradient(#fce768, #f45900 12px, #941205 100%);
 }
 .button:active {
-    background-image: linear-gradient(#1e9eae, #004a4d), linear-gradient(#65d7e6, #008799 calc(100% - 12px), #005e66 100%);;
+    background-image: linear-gradient(#f08c00, #ab0000),
+    linear-gradient(#edba00, #db1d00 12px, #5e0c04 100%);
 }
 .button:disabled {
     background-image: linear-gradient(#d4d4d4, #535454),
@@ -435,13 +473,63 @@ a:active {
     margin-bottom: -8px;
 }
 
+select {
+    border: 1px transparent;
+    border-radius: 10px;
+    background-image:
+        url("../images/down.svg"),
+        linear-gradient(#FFA100, #bb1000),
+        linear-gradient(#FFD900, #F42F00 12px, #820f04 100%);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    padding: 1px;
+    height: 36px;
+    width: 121px;
+    cursor: pointer;
+    font-weight: bold;
+    text-indent: 10px;
+    color: white;
+    font-size: large;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    background-repeat: no-repeat, repeat;
+    background-position: right .5em top 50%, 0 0;
+    background-size: 20px auto, 100%;
+}
+
+select:focus, select:hover {
+    background-image:
+        url("../images/down.svg"),
+        linear-gradient(#ffb300, #bb2c00),
+        linear-gradient(#fce768, #f45900 12px, #941205 100%);
+}
+
+select:active {
+    background-image:
+        url("../images/down.svg"),
+        linear-gradient(#f08c00, #ab0000),
+        linear-gradient(#edba00, #db1d00 12px, #5e0c04 100%);
+}
+
+option {
+    background-color: #333;
+}
+option:checked {
+    background-color: #444;
+}
+option:active, option:hover {
+    background-color: #FFA100;
+}
+
 .popup {
     box-shadow: 3px 3px 3vmin 3px #000;
     background-image: linear-gradient(#333, #444 35%, #222 100%),
     linear-gradient(#bbb, #444 10%, #111 100%);
     transition: background-image 0.6s linear, box-shadow 0.6s linear;
 }
-.button {
+.button, select {
     box-shadow: 0 0 0.5vmin 2px #000;
     text-shadow: 1px 1px 2px #000;
 }
@@ -460,6 +548,58 @@ nav, .mini-buttonlist, .close-button {
 }
 .list-button:active, .list-button:active, .mini-button:active, .close-button:active {
     background-image: linear-gradient(#202020, #2c2c2c), linear-gradient(#222, #111 calc(100% - 10px), #aaa 100%);
+}
+
+#iPlayground {
+    width: 100vmin;
+    height: 100vmin;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-auto-rows: 1fr;
+}
+
+#iPlayground > div {
+    overflow: hidden;
+    width: 60%;
+    margin: auto;
+}
+#iPlayground > div.empty {
+    width: 100%;
+}
+
+#iPlayground > div.empty::after {
+    content: url("../images/stone_empty.svg");
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+}
+#iPlayground > div.black, #iPlayground > div.white {
+    width: 100%;
+    margin: auto;
+    animation-name: flup;
+    animation-duration: 0.3s;
+}
+@keyframes flup {
+    from {width: 60%;}
+    to {width: 100%;}
+}
+#iPlayground > div.black::after {
+    content: url("../images/stone_black.svg");
+}
+#iPlayground > div.white::after {
+    content: url("../images/stone_white.svg");
+}
+
+#iPlayground > div.ok::after {
+    filter: grayscale(100%) brightness(80%) sepia(300%) hue-rotate(108deg) saturate(500%);
+    cursor: pointer;
+}
+#iPlayground > div.empty.ok:hover::after {
+    opacity: 0.2;
+}
+
+#iPlayground > div.wrong::after {
+    filter: grayscale(100%) brightness(50%) sepia(100%) hue-rotate(300deg) saturate(900%) contrast(1);
 }
 
 @media screen and (orientation: landscape) {
@@ -500,6 +640,24 @@ nav, .mini-buttonlist, .close-button {
     .list-button:active > span {
         margin-bottom: 18px;
     }
+    #iMessage {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        max-width: calc(50vw - 50vmin - 10px);
+    }
+
+    #iScore1 {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+    }
+
+    #iScore2 {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+    }
 }
 
 @media screen and (orientation: portrait) {
@@ -539,40 +697,25 @@ nav, .mini-buttonlist, .close-button {
     .list-button:active > span {
         padding-top: 4px;
     }
-}
-
-
-#playground, #background {
-    width: 100vmin;
-    height: 100vmin;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-auto-rows: 1fr;
-    position: absolute;
-    top: 0;
-    left: 0;
- }
-
-#playground > div, #background > div {
- overflow: hidden;
-}
-
-#playground > div.empty::after {
-    content: url("../images/stone_empty.svg");
-}
-#playground > div.black::after {
-    content: url("../images/stone_black.svg");
-}
-#playground > div.white::after {
-    content: url("../images/stone_white.svg");
-}
-
-#background > div.ok::after {
-    content: url("../images/stone_ok.svg");
-}
-#background > div.wrong::after {
-    content: url("../images/stone_wrong.svg");
+    #iPlayground {
+        margin-top: 45px;
+    }
+    #iMessage {
+        position: absolute;
+        top: calc(100vmin + 90px);
+        left: 10px;
+        max-width: calc(100vw - 20px);
+    }
+    #iScore1 {
+        position: absolute;
+        top: calc(100vmin + 50px);
+        left: 10px;
+    }
+    #iScore2 {
+        position: absolute;
+        top: calc(100vmin + 50px);
+        right: 10px;
+    }
 }
 
 /* Toggle-Button */
@@ -659,8 +802,8 @@ nav, .mini-buttonlist, .close-button {
     left: -10%;
 }
 .tgl-skewed:checked + .tgl-btn {
-    background-image: linear-gradient(#9999ff, #6666ff),
-    linear-gradient(#e6e6ff, #6666ff 12px, #00004d 100%);
+    background-image: linear-gradient(#FFA100, #bb1000),
+    linear-gradient(#FFD900, #F42F00 12px, #820f04 100%);
 }
 .tgl-skewed:checked + .tgl-btn:before {
     left: -100%;
@@ -672,18 +815,10 @@ nav, .mini-buttonlist, .close-button {
     left: 10%;
 }
 .tgl-skewed:checked:hover + .tgl-btn, .tgl-skewed:checked:focus + .tgl-btn {
-    background-image: linear-gradient(#b3b3ff, #7c7cff),
-    linear-gradient(#ffffff, #7c7cff 12px, #000080 100%);
+    background-image: linear-gradient(#ffb300, #bb2c00),
+    linear-gradient(#fce768, #f45900 12px, #941205 100%);
 }
 .tgl-skewed:not(:checked):hover + .tgl-btn, .tgl-skewed:not(:checked):focus + .tgl-btn {
     background: linear-gradient(#bbb, #666),
     linear-gradient(#ddd, #666 10px, #333 100%);
-}
-
-/*todo: Temp - remove before flight*/
-
-#message {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
 }
