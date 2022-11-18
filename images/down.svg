@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" viewBox="-2 -1 12 16">
+  <defs>
+    <style>
+      .shadow {
+      filter: drop-shadow( 2px -2px 2px #111);
+      }
+    </style>
+  </defs>
+  <g transform="rotate(90) translate(2,-11)">
+    <path class="shadow" d="M2 2 L9 7 L2 12 Z" style="stroke:white; stroke-linejoin:round; stroke-width:2; fill:none;" />
+  </g>
+</svg>
