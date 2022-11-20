@@ -63,11 +63,11 @@ header .title1 {
 
 .vanish {
     opacity: 0;
-    transform: rotate(180deg) translate(20px,-33px) scale(80%);
+    transform: rotate(180deg)  scale(80%);
 }
 .vanishWhite {
     opacity: 0;
-    transform: rotate(0deg) translate(-20px, -33px) scale(80%);
+    transform: rotate(0deg)  scale(80%);
 }
 
 svg text {

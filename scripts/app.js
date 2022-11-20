@@ -504,12 +504,12 @@
                 if (nEnd === 3) {
                     oPossibleMove.nScore -= 20;
                 }
-                if (nCount > 1) {
+                /*if (nCount > 1) {
                     let cMsg = "Auf Zeile " + fRowCol(oPossibleMove.nID).nRow + " Spalte " + fRowCol(oPossibleMove.nID).nCol + " kann eine Kette mit " + nCount + " Steinen gebildet werden, welche ";
                     cMsg += nEnd === 3 ? "" : " nicht ";
                     cMsg += "verloren gehen kann.";
                     console.log(cMsg);
-                }
+                }*/
             }
 
             // Steine vor dem Rand bekommen drei Punkte abgezogen
@@ -748,6 +748,24 @@
                 }
             });
         });
+        setTimeout(function () {
+            document.getElementsByClassName("eWhite")[1].classList.remove("vanishWhite");
+            document.getElementsByClassName("eBlack")[1].classList.add("vanish");
+        }, 1000);
+
+        setTimeout(function () {
+            document.getElementsByClassName("eWhite")[0].classList.add("vanishWhite");
+            document.getElementsByClassName("eBlack")[0].classList.remove("vanish");
+        }, 1500);
+        setTimeout(function () {
+            document.getElementsByClassName("eWhite")[0].classList.remove("vanishWhite");
+            document.getElementsByClassName("eBlack")[0].classList.add("vanish");
+        }, 2500);
+
+        setTimeout(function () {
+            document.getElementsByClassName("eWhite")[1].classList.add("vanishWhite");
+            document.getElementsByClassName("eBlack")[1].classList.remove("vanish");
+        }, 3000);
 
         $("iInfo").addEventListener("click", function () {
             fShowPopup($("iPopupInfo"));
