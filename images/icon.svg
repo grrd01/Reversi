@@ -9,8 +9,8 @@
             <stop stop-color="#000000" offset="1"/>
         </radialGradient>
         <linearGradient id="background" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="#333"/>
-            <stop offset="1" stop-color="#555"/>
+            <stop offset="0" stop-color="#FDB000"/>
+            <stop offset="1" stop-color="#BE1700"/>
         </linearGradient>
     </defs>
     <g>
