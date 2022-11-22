@@ -130,6 +130,7 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-terser');
+    grunt.loadNpmTasks('grunt-contrib-imagemin');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-replace');
@@ -138,6 +139,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'terser',
         'svgmin',
+        'imagemin',
         'cssmin',
         'htmlmin',
         'replace',
