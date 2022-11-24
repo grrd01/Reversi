@@ -7,7 +7,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// todo: Titel e animieren
 // todo: Steine einzeln switchen
 // todo: Steine animiert switchen
 // todo: online-Mode
@@ -172,10 +171,10 @@
         for (const oStone of oPlayground.children) {
             oStone.className = "empty";
         }
-        oPlayground.children[27].className = lColor[0];
-        oPlayground.children[36].className = lColor[0];
-        oPlayground.children[28].className = lColor[1];
-        oPlayground.children[35].className = lColor[1];
+        oPlayground.children[28].className = lColor[0];
+        oPlayground.children[35].className = lColor[0];
+        oPlayground.children[27].className = lColor[1];
+        oPlayground.children[36].className = lColor[1];
 
         nCurrentPlayer = 0;
         lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
@@ -242,7 +241,6 @@
         let lStonesCaptured = [];
         if (lPlayground[nStoneID] !== "empty") {
             // kein leeres Feld
-            oMessage.innerHTML = "Field already taken";
             return lStonesCaptured;
         }
         for (const lDirection of lDirections){
@@ -424,7 +422,6 @@
         const lBorderStones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 15, 16, 23, 24, 31, 32, 39, 40, 47, 48, 55, 56, 57, 58, 59, 60, 61, 62, 63];
         const lNextBorderStones = [9, 10, 11, 12, 13, 14, 17, 22, 25, 30, 33, 38, 41, 46, 49, 50, 51, 52, 53, 54];
         let nIndex;
-        let nIndex2;
 
         for (const oPossibleMove of lPossibleMoves) {
             // Spielfeld nach dem möglichen Zug ablegen
@@ -579,7 +576,7 @@
             }
             if (oPossibleMove.lPlayground[56] === "empty") {
                 oPossibleMove.lPossibleGemstonesNeighbours.push(48);
-                oPossibleMove.lPossibleGemstonesNeighbours.push(48);
+                oPossibleMove.lPossibleGemstonesNeighbours.push(49);
                 oPossibleMove.lPossibleGemstonesNeighbours.push(57);
             }
             if (oPossibleMove.lPlayground[63] === "empty") {
@@ -588,7 +585,10 @@
                 oPossibleMove.lPossibleGemstonesNeighbours.push(62);
             }
             if (oPossibleMove.lGemstones.length === 0) {
-                oPossibleMove.nScore -= oPossibleMove.lStones.filter(nStone => oPossibleMove.lPossibleGemstonesNeighbours.includes(nStone)).length * 80;
+                oPossibleMove.lGemstonesNeighbours = oPossibleMove.lStones.filter(nStone => oPossibleMove.lPossibleGemstonesNeighbours.includes(nStone));
+                oPossibleMove.nScore -= oPossibleMove.lGemstonesNeighbours.length * 80;
+                // diagonal sind besonders schlimm
+                oPossibleMove.nScore -= oPossibleMove.lGemstonesNeighbours.filter(nStone => [9, 14, 49, 54].includes(nStone)).length * 100;
             }
         }
         return lPossibleMoves;
@@ -611,8 +611,8 @@
             for (const oPossibleMoves of lPossibleMoves) {
                 oPossibleMoves.lPossibleMovesOpponent = fPossibleMoves(oPossibleMoves.lPlayground);
                 if (oPossibleMoves.lPossibleMovesOpponent.length === 0) {
-                    console.log("wenn ich hier spiele, kann Gegner nicht spielen:");
-                    console.log(oPossibleMoves);
+                    //console.log("wenn ich hier spiele, kann Gegner nicht spielen:");
+                    //console.log(oPossibleMoves);
                     oPossibleMoves.nScore = Math.abs(oPossibleMoves.nScore) * 100000;
                 } else {
                     //console.log("Zug des Gegners, nachdem CPU in " + oPossibleMoves.nID + " gespielt hat.");
@@ -634,7 +634,7 @@
         nCurrentPlayer = 1 - nCurrentPlayer;
 
         lPossibleMoves.sort((a,b) =>  b.nScore - a.nScore);
-        console.log(lPossibleMoves);
+        //console.log(lPossibleMoves);
 
         // Wieviele Möglichkeiten mit maximalem Score gibt es?
         let nMaxScore = lPossibleMoves[0].nScore;
@@ -650,7 +650,7 @@
             //tiefsten Wert für Easy
             nMaxScore = lPossibleMoves[lPossibleMoves.length - 1].nScore;
         }
-        console.log(cModus[nCurrentPlayer] + " - Max: " + nMaxScore + " (" + lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length + "/" + lPossibleMoves.length + " possible Moves)");
+        //console.log(cModus[nCurrentPlayer] + " - Max: " + nMaxScore + " (" + lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length + "/" + lPossibleMoves.length + " possible Moves)");
 
         const nCount = lPossibleMoves.filter((oPossibleMove) => oPossibleMove.nScore >= nMaxScore).length;
         // Davon eine wählen
@@ -724,7 +724,6 @@
         fSetLang();
 
         // ServiceWorker initialisieren
-        /* todo: Service-Worker aktivieren
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", function () {
                 navigator.serviceWorker.register("sw.js").then(function (registration) {
@@ -734,7 +733,9 @@
                 });
             });
         }
-        */
+
+        document.getElementsByClassName("eWhite")[0].classList.remove("vanishWhite");
+        document.getElementsByClassName("eBlack")[0].classList.add("vanish");
 
         $("iHeaderSettings").appendChild($("iTitleImg").cloneNode(true));
         $("iHeaderInfo").appendChild($("iTitleImg").cloneNode(true));
@@ -748,6 +749,7 @@
                 }
             });
         });
+
         setTimeout(function () {
             document.getElementsByClassName("eWhite")[1].classList.remove("vanishWhite");
             document.getElementsByClassName("eBlack")[1].classList.add("vanish");
