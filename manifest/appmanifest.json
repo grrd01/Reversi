@@ -14,9 +14,19 @@
   ],
   "screenshots": [
     {
-      "src": "../images/screenshots/grrdsreversi1.png",
+      "src": "../images/screenshots/s1.png",
       "type": "image/png",
-      "sizes": "750x1334"
+      "sizes": "1170x2532"
+    },
+    {
+      "src": "../images/screenshots/s2.png",
+      "type": "image/png",
+      "sizes": "1170x2532"
+    },
+    {
+      "src": "../images/screenshots/s3.png",
+      "type": "image/png",
+      "sizes": "1170x2532"
     }
   ],
   "categories": ["games", "logic games", "casual games", "family games"],
