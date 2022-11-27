@@ -734,9 +734,6 @@
             });
         }
 
-        document.getElementsByClassName("eWhite")[0].classList.remove("vanishWhite");
-        document.getElementsByClassName("eBlack")[0].classList.add("vanish");
-
         $("iHeaderSettings").appendChild($("iTitleImg").cloneNode(true));
         $("iHeaderInfo").appendChild($("iTitleImg").cloneNode(true));
 
