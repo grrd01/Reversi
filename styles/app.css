@@ -822,3 +822,42 @@ nav, .mini-buttonlist, .close-button {
     background: linear-gradient(#bbb, #666),
     linear-gradient(#ddd, #666 10px, #333 100%);
 }
+
+/* light style */
+body.light {
+    background: linear-gradient(#eee, #ddd);
+    color: #555;
+    text-shadow: 1px 1px 2px #aaa;
+}
+.light .popup {
+    box-shadow: 3px 3px 3vmin 3px #444;
+    background-image: linear-gradient(#eee, #fff 35%, #ddd 100%),
+    linear-gradient(#fff, #ccc 10%, #555 100%);
+}
+.light .mini-button, .light .close-button, .light .list-button {
+    background-image: linear-gradient(#eee, #ccc),
+    linear-gradient(#eee, #bbb 10px, #777 100%);
+    color: #555;
+}
+.light .mini-button:hover, .light .mini-button:focus, .light .close-button:hover, .light .close-button:focus, .light .list-button:hover, .light .list-button:focus {
+    background-image: linear-gradient(#fff, #ddd),
+    linear-gradient(#fff, #ccc 10px, #888 100%);
+}
+.light .mini-button:active, .light .close-button:active, .light .list-button:active {
+    background-image: linear-gradient(#bbb, #ddd),
+    linear-gradient(#ddd, #eee calc(100% - 10px), #555 100%);
+}
+.light .button-img, .light .mini-img, .light .w60, .light .w30, .light .close-button > img {
+    filter: invert(60%) drop-shadow( 2px 2px 2px #aaa);
+}
+.light option {
+    background-color: #eee;
+    color: #555;
+}
+.light option:checked {
+    background-color: #ccc;
+    color: #555;
+}
+.light nav, .light .mini-buttonlist, .light .close-button {
+    box-shadow: 0 0 0.5vmin 2px #555;
+}
