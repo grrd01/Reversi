@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="74" height="74" style="fill: none; stroke: white; stroke-width: 3.8; stroke-linejoin: round; stroke-linecap: round;">
+  <g transform="rotate(13) translate(10, -12)">
+    <path d="M 20 50
+             C 20 35, 37 50, 32 15
+             C 32 15, 30 3, 37 3
+             C 44 3, 42 15, 42 15
+             C 37 50, 54 35, 54 50
+             Z"/>
+    <path d="M 20 55
+             Q 20 65,14 71
+             L 24 72
+             Q 28 69, 30 62
+             Q 30 69, 29 72
+             L 51 72
+             Q 54 65, 54 55
+             Z"/>
+  </g>
+</svg>
