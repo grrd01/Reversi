@@ -10,7 +10,6 @@
 // todo: Steine einzeln switchen
 // todo: Steine animiert switchen
 // todo: online-Mode
-// todo: hell/dunkel
 
 (function () {
     "use strict";
@@ -32,6 +31,8 @@
         lDev: "Developed by Gérard Tyedmers.",
         lLook: "Have a look at my other games:",
         lSelLang: "Select language",
+        lDesign: "Select design",
+        lStyle: ["Light", "Dark", "Automatic"],
         lShow: "Show possible moves",
         lSound: "Play sounds",
         lBegin: " begins.",
@@ -58,6 +59,8 @@
         lDev: "Entwickelt von Gérard Tyedmers.",
         lLook: "Schau dir auch meine anderen Spiele an:",
         lSelLang: "Sprache wählen",
+        lDesign: "Design wählen",
+        lStyle: ["Hell", "Dunkel", "Automatisch"],
         lShow: "Mögliche Züge anzeigen",
         lSound: "Töne abspielen",
         lBegin: " beginnt.",
@@ -83,6 +86,8 @@
         lDev: "Développé par Gérard Tyedmers.",
         lLook: "Regarde aussi mes autres jeux:",
         lSelLang: "Choisir la langue",
+        lDesign: "Choisir la vue",
+        lStyle: ["Clair", "Sombre", "Automatique"],
         lShow: "Afficher les mouvements possibles",
         lSound: "Jouer des sons",
         lBegin: " commence.",
@@ -159,6 +164,10 @@
         $("lDev").innerHTML = lLoc[nLang].lDev;
         $("lLook").innerHTML = lLoc[nLang].lLook;
         $("lSelLang").innerHTML = lLoc[nLang].lSelLang;
+        $("lDesign").innerHTML = lLoc[nLang].lDesign;
+        document.querySelectorAll('#iStyle option').forEach(function(oOption,nIndex) {
+            oOption.innerHTML = lLoc[nLang].lStyle[nIndex];
+        });
         $("lShow").innerHTML = lLoc[nLang].lShow;
         $("lSound").innerHTML = lLoc[nLang].lSound;
     }
@@ -695,6 +704,18 @@
         ePopup.classList.add("popup-hide");
     }
 
+    // Style setzen
+    function fSetStyle() {
+        let bLightModeOn = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+        let nStyle = parseInt($("iStyle").value);
+        //console.log(`light mode is ${bLightModeOn ? '☀ on' : '🌒 off'}.`);
+        if (nStyle === 0 || (nStyle === 2 && bLightModeOn)) {
+            document.getElementsByTagName("body")[0].classList.add("light");
+        } else {
+            document.getElementsByTagName("body")[0].classList.remove("light");
+        }
+    }
+
     /**
      * Spiel initialisieren
      */
@@ -712,14 +733,17 @@
                 localStorage.getItem("s_reversi_lang") === null ? nLang : parseInt(localStorage.getItem("s_reversi_lang"))
             );
             $("iLang").value = nLang;
+            $("iStyle").value = (
+                localStorage.getItem("s_reversi_style") === null ? 1 : parseInt(localStorage.getItem("s_reversi_style"))
+            );
             bShowMoves = (
-                localStorage.getItem("s_reversi_show") === null ? nLang : localStorage.getItem("s_reversi_show") === "true"
+                localStorage.getItem("s_reversi_show") === null ? true : localStorage.getItem("s_reversi_show") === "true"
             );
             $("iShowMoves").checked = bShowMoves;
             bSound = (
-                localStorage.getItem("s_reversi_sound") === null ? 1 : localStorage.getItem("s_reversi_sound") === "true"
+                localStorage.getItem("s_reversi_sound") === null ? true : localStorage.getItem("s_reversi_sound") === "true"
             );
-            bSound = $("iSound").checked = bSound;
+            $("iSound").checked = bSound;
         }
         fSetLang();
 
@@ -785,12 +809,16 @@
                 localStorage.setItem("s_reversi_lang", nLang);
                 localStorage.setItem("s_reversi_show", bShowMoves);
                 localStorage.setItem("s_reversi_sound", bSound);
+                localStorage.setItem("s_reversi_style", $("iStyle").value);
             }
             fHidePopup($("iPopupSettings"));
         });
         $("iLang").addEventListener("change", function() {
             nLang = $("iLang").value;
             fSetLang();
+        });
+        $("iStyle").addEventListener("change", function() {
+            fSetStyle();
         });
 
         Array.from(document.getElementsByClassName("list-button")).forEach(function (rButton) {
@@ -802,12 +830,22 @@
         // Applikation initialisieren
         let nIndex;
         let oStone;
-        // Grid für eigene Bilder aufbauen
+        // Grid für Steine aufbauen
         for (nIndex = 0; nIndex < 64; nIndex += 1) {
             oStone = document.createElement("div");
             oPlayground.appendChild(oStone);
             oStone.onclick = fClickHandler(oStone);
         }
+
+        try {
+            window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+                fSetStyle();
+            });
+        }
+        catch(err) {
+            console.log(err.message);
+        }
+        fSetStyle();
     }
 
     fInit();
