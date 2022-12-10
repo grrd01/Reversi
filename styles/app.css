@@ -199,6 +199,17 @@ button:focus, select:focus {
     outline: none;
 }
 
+button:disabled {
+    pointer-events: none;
+}
+button > * {
+    transition-property: opacity;
+    transition-duration: 1s;
+}
+button:disabled > * {
+    opacity: 0.4;
+}
+
 nav {
     display: flex;
     margin: 5px;
@@ -473,6 +484,21 @@ a:active {
     margin-bottom: -8px;
 }
 
+input[type=text] {
+    height: 36px;
+    width: 121px;
+    padding: 10px;
+    display: inline-block;
+    border: 1px solid #222;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-size: large;
+    box-shadow: inset 1px 2px 4px 1px #444;
+}
+input[type=text]:focus {
+    outline: none;
+}
+
 select {
     border: 1px transparent;
     border-radius: 10px;
@@ -607,11 +633,12 @@ nav, .mini-buttonlist, .close-button {
         flex-direction: row;
     }
     .list-button {
-        display: inline-block;
-        width: calc(25vw - 6px);
-        text-align: center;
+        flex-grow: 1;
         padding: 1px 0 1px 0;
         margin-left: 1px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
     .list-button:first-child {
         border-top-left-radius: 10px;
@@ -849,6 +876,10 @@ body.light {
 }
 .light .button-img, .light .mini-img, .light .w60, .light .w30, .light .close-button > img {
     filter: invert(60%) drop-shadow( 2px 2px 2px #aaa);
+}
+.light input[type=text] {
+    border: 1px solid #999;
+    box-shadow: inset 1px 2px 4px 1px #bbb;
 }
 .light option {
     background-color: #eee;
