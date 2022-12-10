@@ -10,7 +10,7 @@
 /*jslint devel: true, browser: true, long: true */ /*global self fetch */
 
 const CACHE_NAME = "grrds-Reversi-cache";
-const CACHE_VERSION = "v0.3";
+const CACHE_VERSION = "v2.0";
 const CACHE = CACHE_NAME + "-" + CACHE_VERSION;
 
 const urlsToCache = [
@@ -33,6 +33,7 @@ const urlsToCache = [
     "images/medium.svg",
     "images/memo.svg",
     "images/ok.svg",
+    "images/player.svg",
     "images/puzzle.svg",
     "images/settings.svg",
     "images/sound_on.svg",
