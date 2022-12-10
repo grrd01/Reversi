@@ -1,0 +1,26 @@
+{
+  "name": "grrdsReversi",
+  "version": "2.0.0",
+  "description": "grrd's Reversi - Online version",
+  "author": {
+    "name": "Gerard Tyedmers",
+    "email": "grrd@gmx.net",
+    "url": "https://github.com/grrd01/Reversi/"
+  },
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grrd01/Reversi.git"
+  },
+  "engines": {
+    "node": "6.11.0",
+    "npm": "3.10.10"
+  },
+  "scripts": {
+    "start": "./reversi_server.js"
+  },
+  "dependencies": {
+    "socket.io": "1.7.4",
+    "moniker": "0.1.2"
+  }
+}
