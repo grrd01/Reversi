@@ -25,11 +25,15 @@
         lMedium: "Medium",
         lHard: "Hard",
         lOnline: "Online",
+        lWait: "Waiting for player 2 ...",
+        lWait2: "You can play a 1 player game meanwhile.",
+        lLeft: "Your opponent has left the game.",
         lHelp: "Place your stone so that at least one of your opponent's stones is flanked by your stones. " +
             "All of your opponent's stones between your pieces are then flipped over to become your color. \n" +
             "The object of the game is to own more stones than your opponent when the game is over. ",
         lDev: "Developed by Gérard Tyedmers.",
         lLook: "Have a look at my other games:",
+        lName: "Enter your name",
         lSelLang: "Select language",
         lDesign: "Select design",
         lStyle: ["Light", "Dark", "Automatic"],
@@ -43,7 +47,6 @@
         lNoMove: " can't move. ",
         lNobodyMove: "Game over, no player can move. ",
         lNotHere: " can't play here."
-
     }, {
         lCode: "de",
         lLang: "Deutsch",
@@ -53,11 +56,15 @@
         lMedium: "Mittel",
         lHard: "Schwer",
         lOnline: "Online",
+        lWait: "Warte auf Spieler 2 ...",
+        lWait2: "Du kannst unterdessen ein Einzelspieler-Spiel starten.",
+        lLeft: "Dein Gegner hat das Spiel verlassen.",
         lHelp: "Platziere deinen Stein so, dass er mindestens einen Stein deines Gegners einklemmt. " +
             "Alle eingeklemmten Steine werden dann umgedreht und wechseln zu deiner Farbe.\n" +
             "Ziel des Spiels ist es, beim Spielende mehr Steine als der Gegner zu haben. ",
         lDev: "Entwickelt von Gérard Tyedmers.",
         lLook: "Schau dir auch meine anderen Spiele an:",
+        lName: "Namen eingeben",
         lSelLang: "Sprache wählen",
         lDesign: "Design wählen",
         lStyle: ["Hell", "Dunkel", "Automatisch"],
@@ -80,11 +87,15 @@
         lMedium: "Moyens",
         lHard: "Difficile",
         lOnline: "En ligne",
+        lWait: "En attente pour joueur 2 ...",
+        lWait2: "Tu peux en attendant commencer un jeu à joueur unique.",
+        lLeft: "Ton adversaire a quitté le match.",
         lHelp: "Place ton pion de manière à ce qu'il coince au moins un pion de ton adversaire. " +
             "Tous les pions coincés sont alors retournés et changent de couleur. " +
             "Le but du jeu est d'avoir plus de pions que l'adversaire à la fin de la partie. ",
         lDev: "Développé par Gérard Tyedmers.",
         lLook: "Regarde aussi mes autres jeux:",
+        lName: "Choisir ton nom",
         lSelLang: "Choisir la langue",
         lDesign: "Choisir la vue",
         lStyle: ["Clair", "Sombre", "Automatique"],
@@ -104,6 +115,12 @@
     let nCurrentPlayer = 0;
     // Modus des Spiels: human, easy, medium, hard, online
     let cModus = [];
+    // Verbindung für Online-Spiele
+    let socket;
+    // Daten der Online-Spieler
+    let user;
+    // Zähler für die Runden einer Partie
+    let nCountRound = 0;
     // Array der Farben der beiden Spieler
     const lColor = ["black","white"];
     // Array der Stein-Bilder der beiden Spieler
@@ -156,20 +173,12 @@
             document.documentElement.setAttribute("lang", lLoc[nLang].lCode);
         }
         document.querySelector("meta[name='description']").setAttribute("content", lLoc[nLang].lDesc);
-        $("l2Players").innerHTML = lLoc[nLang].l2Players;
-        $("lEasy").innerHTML = lLoc[nLang].lEasy;
-        $("lMedium").innerHTML = lLoc[nLang].lMedium;
-        $("lHard").innerHTML = lLoc[nLang].lHard;
-        $("lHelp").innerHTML = lLoc[nLang].lHelp;
-        $("lDev").innerHTML = lLoc[nLang].lDev;
-        $("lLook").innerHTML = lLoc[nLang].lLook;
-        $("lSelLang").innerHTML = lLoc[nLang].lSelLang;
-        $("lDesign").innerHTML = lLoc[nLang].lDesign;
         document.querySelectorAll('#iStyle option').forEach(function(oOption,nIndex) {
             oOption.innerHTML = lLoc[nLang].lStyle[nIndex];
         });
-        $("lShow").innerHTML = lLoc[nLang].lShow;
-        $("lSound").innerHTML = lLoc[nLang].lSound;
+        document.querySelectorAll(`[id^="l"]`).forEach(function(eElement) {
+            eElement.innerHTML = lLoc[nLang][eElement.id];
+        });
     }
 
     /**
@@ -185,15 +194,16 @@
         oPlayground.children[27].className = lColor[1];
         oPlayground.children[36].className = lColor[1];
 
+        nCountRound = 0;
         nCurrentPlayer = 0;
         lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
         oMessage.innerHTML = lStoneImg[nCurrentPlayer] + lLoc[nLang].lBegin;
         $("iScore1").innerHTML = lStoneImg[0] + " " + document.getElementsByClassName(lColor[0]).length;
         $("iScore2").innerHTML = document.getElementsByClassName(lColor[1]).length + " " + lStoneImg[1];
 
-        if (cModus[nCurrentPlayer] !== "human") {
+        if (cModus[nCurrentPlayer] !== "human" && cModus[nCurrentPlayer] !== "online") {
             fAI(lPossibleMoves)
-        } else if (bShowMoves) {
+        } else if (bShowMoves && cModus[nCurrentPlayer] === "human") {
             for (const oPossibleMove of lPossibleMoves) {
                 oPlayground.children[oPossibleMove.nID].classList.add("ok");
             }
@@ -209,16 +219,25 @@
         cModus[0] = "human"; // todo: switch [ human ] to [ easy medium hard ] for testing
         cModus[1] = event.target.getAttribute("data-player2");
         fResetGame();
-        iTitle.classList.remove("swipe-out-right");
-        iGame.classList.remove("swipe-in-left");
-        iTitle.classList.add("swipe-out");
-        iGame.classList.add("swipe-in");
+        if (cModus[1] === "online") {
+            fOnline();
+        } else {
+            iTitle.classList.remove("swipe-out-right");
+            iGame.classList.remove("swipe-in-left");
+            iTitle.classList.add("swipe-out");
+            iGame.classList.add("swipe-in");
+        }
     }
 
     /**
      * Spiel verlassen
      */
     function fQuitGame() {
+        if (cModus[0] === "online" || cModus[1] === "online") {
+            socket.disconnect();
+            $("iOnline").disabled = false;
+        }
+        cModus = [];
         iTitle.classList.remove("swipe-out");
         iGame.classList.remove("swipe-in");
         iTitle.classList.add("swipe-out-right");
@@ -236,7 +255,6 @@
             nCol: nIndex % 8
         }
     }
-
 
     /**
      * Prüfen, ob im übergebenen Array auf der übergebenen Position ein Spielzug möglich ist
@@ -326,6 +344,11 @@
         }
 
         if (lStonesCaptured.length > 0) {
+            nCountRound += 1;
+            // gespielter Stein an Online-Gegner senden
+            if (cModus[1 - nCurrentPlayer] === "online") {
+                socket.emit("playsend", {to: user.opponent, nStone: nStoneID, nRound: nCountRound});
+            }
             // eingeklemmte Steine drehen
             for (const nStoneCaptured of lStonesCaptured) {
                 if (oPlayground.children[nStoneCaptured].classList.contains("white") || oPlayground.children[nStoneCaptured].classList.contains("white")) {
@@ -370,9 +393,9 @@
                 if (lPossibleMoves.length > 0) {
                     // nächster Spieler kann spielen
                     oMessage.innerHTML = lStoneImg[nCurrentPlayer] +  lLoc[nLang].lTurn;
-                    if (cModus[nCurrentPlayer] !== "human") {
+                    if (cModus[nCurrentPlayer] !== "human" && cModus[nCurrentPlayer] !== "online") {
                         fAI(lPossibleMoves)
-                    } else if (bShowMoves) {
+                    } else if (bShowMoves && cModus[nCurrentPlayer] === "human") {
                         for (const oPossibleMove of lPossibleMoves) {
                             oPlayground.children[oPossibleMove.nID].classList.add("ok");
                         }
@@ -384,9 +407,9 @@
                         // nächster Spieler kann nicht spielen und wird übersprungen
                         oMessage.innerHTML = lStoneImg[1 - nCurrentPlayer] + lLoc[nLang].lNoMove +
                             lStoneImg[nCurrentPlayer] + lLoc[nLang].lTurn;
-                        if (cModus[nCurrentPlayer] !== "human") {
+                        if (cModus[nCurrentPlayer] !== "human" && cModus[nCurrentPlayer] !== "online") {
                             fAI(lPossibleMoves)
-                        } else if (bShowMoves) {
+                        } else if (bShowMoves && cModus[nCurrentPlayer] === "human") {
                             for (const oPossibleMove of lPossibleMoves) {
                                 oPlayground.children[oPossibleMove.nID].classList.add("ok");
                             }
@@ -670,6 +693,106 @@
         }, 1000);
     }
 
+    function fOnline() {
+        let oLastStart;
+        let oLastQuit;
+        let nLastRound;
+        fShowPopup($("iPopupOnline"));
+        $("iOnline").disabled = true;
+
+        socket = io.connect("http://localhost:49153", {"forceNew": true});
+        //socket = io.connect("https://grrd.a2hosted.com:49153", {"forceNew": true});
+
+        socket.heartbeatTimeout = 20000;
+        socket.on("connect", function () {
+            console.log("connected");
+        });
+
+        socket.on("startgame", function (data) {
+            user = data;
+            if (user.id !== oLastStart) {
+                socket.emit("usersend", {
+                    to: user.opponent,
+                    name: $("iName").value
+                });
+                oLastStart = user.id;
+                //onExit = false;
+                if (cModus.length) {
+                    // ausstieg aus aktuellem Single-Player-Game
+                }
+                if (user.role === "0") {
+                    if ($("iName").value) {
+                        //p1_name = $("iName").value
+                    } else {
+                        //p1_name = document.webL10n.get("lb_player1");
+                    }
+                    //p2_name = document.webL10n.get("bt_online");
+                } else {
+                    //p1_name = document.webL10n.get("bt_online");
+                    if ($("iName").value) {
+                        //p2_name = $("iName").value
+                    } else {
+                        //p2_name = document.webL10n.get("lb_player1");
+                    }
+                }
+                // $("P1name").innerHTML = p1_name;
+                // $("P2name").innerHTML = p2_name;
+                fHidePopup($("iPopupOnline"));
+
+                if (user.role === "0") {
+                    cModus[0] = "human";
+                    cModus[1] = "online";
+                } else {
+                    cModus[0] = "online";
+                    cModus[1] = "human";
+                }
+                fResetGame();
+                iTitle.classList.remove("swipe-out-right");
+                iGame.classList.remove("swipe-in-left");
+                iTitle.classList.add("swipe-out");
+                iGame.classList.add("swipe-in");
+            }
+        });
+
+        socket.on("playget", function (data) {
+            if (data.nRound === 1 && nCountRound > 0) {
+                // Online-Gegner beginnt neues Spiel, während popupDialog noch offen ist
+                fResetGame();
+            }
+            if (data.nRound === nCountRound + 1 && nLastRound !== data.nRound) {
+                nLastRound = data.nRound;
+                //fromOnline = true;
+
+                // Spielzug des Online-Gegners auf empfangenem Feld durchführen
+                setTimeout(function() {
+                    fClickStone(oPlayground.children[data.nStone]);
+                }, 10);
+            }
+        });
+
+        socket.on("userget", function (data) {
+            if (user.role === "0") {
+                if (data.name.length > 0) {
+                    ///p2_name = data.name;
+                    //$("P2name").innerHTML = p2_name;
+                }
+            } else {
+                if (data.name.length > 0) {
+                    //p1_name = data.name;
+                    //$("P1name").innerHTML = p1_name;
+                }
+            }
+        });
+
+        socket.on("quit", function () {
+            if (user.id !== oLastQuit && cModus.length &&  (cModus[0] === "online" || cModus[1] === "online" )) {
+                oLastQuit = user.id;
+                // onExit = true;
+                fShowPopup($("iPopupLeft"));
+            }
+        });
+    }
+
     /**
      * Click-Handler für Felder generieren
      * @param {element} oStone - Feld, welches einen Klick-Handler bekommen soll
@@ -758,8 +881,14 @@
             });
         }
 
-        $("iHeaderSettings").appendChild($("iTitleImg").cloneNode(true));
-        $("iHeaderInfo").appendChild($("iTitleImg").cloneNode(true));
+        if (!navigator.onLine || typeof io === "undefined") {
+            // offline :(
+            $("iOnline").disabled = true;
+        }
+
+        Array.from(document.getElementsByClassName("popup-head")).forEach(function (eHead) {
+            eHead.appendChild($("iTitleImg").cloneNode(true));
+        });
 
         Array.from(document.getElementsByClassName("eBlack")).forEach(function (eBlack) {
             eBlack.addEventListener("click", function (event) {
@@ -813,6 +942,15 @@
             }
             fHidePopup($("iPopupSettings"));
         });
+
+        $("iOnlineClose").addEventListener("click", function () {
+            fHidePopup($("iPopupOnline"));
+        });
+        $("iLeftClose").addEventListener("click", function () {
+            fHidePopup($("iPopupLeft"));
+            fQuitGame();
+        });
+
         $("iLang").addEventListener("change", function() {
             nLang = $("iLang").value;
             fSetLang();
