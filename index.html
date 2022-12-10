@@ -80,11 +80,14 @@
                 <button id="iHard" class="list-button" data-player2="hard">
                     <img class="button-img shadow" src="images/hard.svg" alt="Hard"><span id="lHard">Hard</span>
                 </button>
+                <button id="iOnline" class="list-button" data-player2="online">
+                    <img class="button-img shadow" src="images/2online.svg" alt="Online"><span id="lOnline">Online</span>
+                </button>
             </nav>
         </fieldset>
         <div id="iPopupInfo" class="overflow popup-init">
             <div class="popup">
-                <div id="iHeaderInfo" class="popup-head">
+                <div class="popup-head">
                 </div>
                 <div class="popup-body">
                     <p id="lHelp" class="popup-content">Place your stone so that at least one of your opponent's stones is flanked by your stones.
@@ -129,9 +132,16 @@
         </div>
         <div id="iPopupSettings" class="overflow popup-init">
             <div class="popup">
-                <div id="iHeaderSettings" class="popup-head">
+                <div class="popup-head">
                 </div>
                 <div class="popup-body">
+                    <div class="popup-content">
+                        <img class="w30" src="images/player.svg" alt="name">
+                        <span id="lName">Your name</span>
+                        <div class="fr">
+                            <input id="iName" value="" type="text" size="10" maxlength="10" aria-labelledby="lName">
+                        </div>
+                    </div>
                     <div class="popup-content">
                         <img class="w30" src="images/language.svg" alt="language">
                         <span id="lSelLang">Select language</span>
@@ -147,7 +157,7 @@
                         <img class="w30" src="images/design.svg" alt="design">
                         <span id="lDesign">Select Design</span>
                         <div class="fr">
-                            <select id="iStyle" aria-labelledby="lSelLang">
+                            <select id="iStyle" aria-labelledby="lDesign">
                                 <option value="0">Light</option>
                                 <option value="1">Dark</option>
                                 <option value="2">Automatic</option>
@@ -179,6 +189,22 @@
             </div>
             <div class="buffer"></div>
         </div>
+        <div id="iPopupOnline" class="overflow popup-init">
+            <div class="popup">
+                <div class="popup-head">
+                </div>
+                <div class="popup-body">
+                    <h3 id="lWait">Waiting for player 2 ...</h3>
+                    <p id="lWait2">You can play a 1 player game meanwhile.</p>
+                </div>
+                <div class="popup-footer">
+                    <button id="iOnlineClose" class="button">
+                        <span class="button-span"><img class="w25 shadow" src="images/ok.svg" alt="OK">&nbsp;OK</span>
+                    </button>
+                </div>
+            </div>
+            <div class="buffer"></div>
+        </div>
     </main>
     <div id="iGame" class="page">
         <div id="iScore1"></div>
@@ -188,9 +214,25 @@
             <img class="" src="images/x.svg" alt="close">
         </button>
         <div id="iPlayground"></div>
+        <div id="iPopupLeft" class="overflow popup-init">
+            <div class="popup">
+                <div class="popup-head">
+                </div>
+                <div class="popup-body">
+                    <p id="lLeft">Your opponent has left the game.</p>
+                </div>
+                <div class="popup-footer">
+                    <button id="iLeftClose" class="button">
+                        <span class="button-span"><img class="w25 shadow" src="images/ok.svg" alt="OK">&nbsp;OK</span>
+                    </button>
+                </div>
+            </div>
+            <div class="buffer"></div>
+        </div>
     </div>
 
-
+    <script src="http://localhost:49153/socket.io/socket.io.js"></script>
+<!--    <script src="https://grrd.a2hosted.com:49153/socket.io/socket.io.js"></script>-->
     <script src="scripts/app.js"></script>
 </body>
 </html>
