@@ -54,6 +54,7 @@ module.exports = function(grunt) {
                     {'../../2_Build/Reversi/images/medium.svg': 'images/medium.svg'},
                     {'../../2_Build/Reversi/images/memo.svg': 'images/memo.svg'},
                     {'../../2_Build/Reversi/images/ok.svg': 'images/ok.svg'},
+                    {'../../2_Build/Reversi/images/player.svg': 'images/player.svg'},
                     {'../../2_Build/Reversi/images/puzzle.svg': 'images/puzzle.svg'},
                     {'../../2_Build/Reversi/images/settings.svg': 'images/settings.svg'},
                     {'../../2_Build/Reversi/images/sound_on.svg': 'images/sound_on.svg'},
