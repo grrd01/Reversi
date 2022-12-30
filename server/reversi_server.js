@@ -52,7 +52,6 @@
     }
 
     // Get newest Cert and Key-File on server
-    /*
     var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^grrd_a2hosted_com_.*.crt$"));
     var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(43, 54) + ".*.key$"));
 
@@ -60,7 +59,6 @@
         key: fs.readFileSync(key),
         cert: fs.readFileSync(cert)
     };
-    */
 
     function handler(ignore, res) {
         fs.readFile(
@@ -78,10 +76,10 @@
     }
 
     // Start App on Server:
-    //var app = require("https").createServer(options, handler);
+    var app = require("https").createServer(options, handler);
 
     // Start App on LocalHost:
-    var app = require("http").createServer(handler);
+    //var app = require("http").createServer(handler);
 
     var io = require("socket.io").listen(app);
     var Moniker = require("moniker");
