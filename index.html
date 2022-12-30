@@ -95,7 +95,7 @@
                         The object of the game is to own more stones than your opponent when the game is over.</p>
                     <p id="lDev" class="popup-content">Developed by Gérard Tyedmers.</p>
                     <p id="lLook">Have a look at my other games:</p>
-                    <table id="tLinks">
+                    <table class="w100">
                         <tr>
                             <td><a href="https://grrd01.github.io/Puzzle" target="_blank" rel="noopener" tabindex="-1"><img src="images/puzzle.svg" alt="Puzzle" class="w60 shadow"></a></td>
                             <td><span id="iPuzzle"></span> <a href="https://grrd01.github.io/Puzzle" target="_blank" rel="noopener">grrd's Puzzle</a></td>
@@ -224,6 +224,39 @@
                 <div class="popup-footer">
                     <button id="iLeftClose" class="button">
                         <span class="button-span"><img class="w25 shadow" src="images/ok.svg" alt="OK">&nbsp;OK</span>
+                    </button>
+                </div>
+            </div>
+            <div class="buffer"></div>
+        </div>
+        <div id="iPopupGameOver" class="overflow popup-init">
+            <div class="popup">
+                <div class="popup-head">
+                </div>
+                <div class="popup-body">
+                    <p id="iFinalMessage">Game Over.</p>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <div id="iPlayer1"></div>
+                        <div id="iPlayer2"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around;">
+                        <div id="iFinalScore1"></div>
+                        <div id="lStones"></div>
+                        <div id="iFinalScore2"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-around;">
+                        <div id="iGames1"></div>
+                        <div id="lGames"></div>
+                        <div id="iGames2"></div>
+                    </div>
+                    <p id="lAgain">Play again?</p>
+                </div>
+                <div class="popup-footer">
+                    <button id="iYes" class="button">
+                        <span class="button-span"><img class="w25 shadow" src="images/ok.svg" alt="OK">&nbsp;<span id="lYes">Yes</span></span>
+                    </button>
+                    <button id="iNo" class="button">
+                        <span class="button-span"><img class="w25 shadow" src="images/x.svg" alt="OK">&nbsp;<span id="lNo">No</span></span>
                     </button>
                 </div>
             </div>
