@@ -672,6 +672,7 @@ nav, .mini-buttonlist, .close-button {
         top: 10px;
         left: 10px;
         max-width: calc(50vw - 50vmin - 10px);
+        line-height: 200%;
     }
 
     #iScore1 {
@@ -732,6 +733,7 @@ nav, .mini-buttonlist, .close-button {
         top: calc(100vmin + 90px);
         left: 10px;
         max-width: calc(100vw - 20px);
+        line-height: 200%;
     }
     #iScore1 {
         position: absolute;
