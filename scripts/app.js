@@ -7,9 +7,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// todo: Steine einzeln switchen
-// todo: Steine animiert switchen
-// todo: online-Mode
+// todo: alle Steine animiert switchen
+// todo: name in localstorage
 
 (function () {
     "use strict";
@@ -46,7 +45,14 @@
         lTurn: "'s turn.",
         lNoMove: " can't move. ",
         lNobodyMove: "Game over, no player can move. ",
-        lNotHere: " can't play here."
+        lNotHere: " can't play here.",
+        lComputer: "Computer",
+        lPlayer: "Player",
+        lStones: "Stones",
+        lGames: "Games",
+        lAgain: "Play again?",
+        lYes: "Yes",
+        lNo: "No"
     }, {
         lCode: "de",
         lLang: "Deutsch",
@@ -77,7 +83,14 @@
         lTurn: " ist am Zug.",
         lNoMove: " kann nicht ziehen. ",
         lNobodyMove: "Spiel beendet, kein Spieler kann ziehen. ",
-        lNotHere: " kann hier nicht spielen."
+        lNotHere: " kann hier nicht spielen.",
+        lComputer: "Computer",
+        lPlayer: "Spieler",
+        lStones: "Steine",
+        lGames: "Spiele",
+        lAgain: "Nochmals spielen?",
+        lYes: "Ja",
+        lNo: "Nein"
     }, {
         lCode: "fr",
         lLang: "Francais",
@@ -108,19 +121,35 @@
         lTurn: " au tour.",
         lNoMove: " ne peut pas jouer. ",
         lNobodyMove: "Jeu terminé, aucun joueur ne peut bouger. ",
-        lNotHere: " ne peut pas jouer ici."
+        lNotHere: " ne peut pas jouer ici.",
+        lComputer: "Ordinateur",
+        lPlayer: "Joueur",
+        lStones: "Pions",
+        lGames: "Jeux",
+        lAgain: "Un autre jeu?",
+        lYes: "Oui",
+        lNo: "Non"
     }];
 
     // Spieler, welcher am Zug ist (0/1)
     let nCurrentPlayer = 0;
-    // Modus des Spiels: human, easy, medium, hard, online
+    // Spieler, welcher die Partie beginnt (0/1)
+    let nStartPlayer = 0;
+    // Rolle der beiden Spieler: human, easy, medium, hard, online
     let cModus = [];
+    // Namen der beiden Spieler
+    let cName = [];
+    // Gewonnene Spiele pro Spieler
+    let nGames = [];
     // Verbindung für Online-Spiele
     let socket;
     // Daten der Online-Spieler
     let user;
     // Zähler für die Runden einer Partie
     let nCountRound = 0;
+    let nLastRound = 0;
+    // Flag zum Verhindern doppelter Resets bei Online-Spielen
+    let bResetNeeded = false;
     // Array der Farben der beiden Spieler
     const lColor = ["black","white"];
     // Array der Stein-Bilder der beiden Spieler
@@ -189,15 +218,17 @@
         for (const oStone of oPlayground.children) {
             oStone.className = "empty";
         }
+
         oPlayground.children[28].className = lColor[0];
         oPlayground.children[35].className = lColor[0];
         oPlayground.children[27].className = lColor[1];
         oPlayground.children[36].className = lColor[1];
 
         nCountRound = 0;
-        nCurrentPlayer = 0;
+        nLastRound = 0;
+        nCurrentPlayer = nStartPlayer;
         lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
-        oMessage.innerHTML = lStoneImg[nCurrentPlayer] + lLoc[nLang].lBegin;
+        oMessage.innerHTML = lStoneImg[nCurrentPlayer] + " " + cName[nCurrentPlayer] + " " + lLoc[nLang].lBegin;
         $("iScore1").innerHTML = lStoneImg[0] + " " + document.getElementsByClassName(lColor[0]).length;
         $("iScore2").innerHTML = document.getElementsByClassName(lColor[1]).length + " " + lStoneImg[1];
 
@@ -208,7 +239,7 @@
                 oPlayground.children[oPossibleMove.nID].classList.add("ok");
             }
         }
-
+        bResetNeeded = false;
     }
 
     /**
@@ -216,12 +247,25 @@
      * @param {event} event - Click-Event auf einen der Buttons [human, easy, medium, hard]
      */
     function fStartGame(event) {
-        cModus[0] = "human"; // todo: switch [ human ] to [ easy medium hard ] for testing
+        cModus[0] = "human";
         cModus[1] = event.target.getAttribute("data-player2");
-        fResetGame();
+
         if (cModus[1] === "online") {
             fOnline();
         } else {
+            if ($("iName").value) {
+                cName[0] = $("iName").value;
+            } else {
+                cName[0] = lLoc[nLang].lPlayer + " 1";
+            }
+            if (cModus[1] === "human") {
+                cName[1] = lLoc[nLang].lPlayer + " 2";
+            } else {
+                cName[1] = lLoc[nLang].lComputer;
+            }
+            nStartPlayer = 0;
+            nGames = [0, 0];
+            fResetGame();
             iTitle.classList.remove("swipe-out-right");
             iGame.classList.remove("swipe-in-left");
             iTitle.classList.add("swipe-out");
@@ -373,26 +417,40 @@
             }
             if (document.getElementsByClassName("empty").length === 0) {
                 // alle Felder besetzt, Spiel beendet
-                oMessage.innerHTML = lLoc[nLang].lOver;
+                $("iFinalMessage").innerHTML = lLoc[nLang].lOver;
+                $("iPlayer1").innerHTML = lStoneImg[0] + " " + cName[0];
+                $("iPlayer2").innerHTML = cName[1] + " " + lStoneImg[1];
+                $("iFinalScore1").innerHTML = document.getElementsByClassName(lColor[0]).length;
+                $("iFinalScore2").innerHTML = document.getElementsByClassName(lColor[1]).length;
                 if (document.getElementsByClassName(lColor[0]).length > document.getElementsByClassName(lColor[1]).length) {
-                    oMessage.innerHTML += lStoneImg[0] + lLoc[nLang].lWin;
+                    nGames[0] += 1;
+                    oMessage.innerHTML = lStoneImg[0] + lLoc[nLang].lWin;
+                    $("iFinalMessage").innerHTML += lStoneImg[0] + " " + cName[0] + " " + lLoc[nLang].lWin;
                 } else if (document.getElementsByClassName(lColor[0]).length < document.getElementsByClassName(lColor[1]).length) {
-                    oMessage.innerHTML += lStoneImg[1] + lLoc[nLang].lWin;
+                    nGames[1] += 1;
+                    oMessage.innerHTML = lStoneImg[1] + lLoc[nLang].lWin;
+                    $("iFinalMessage").innerHTML += lStoneImg[1] + " " + cName[1] + " " + lLoc[nLang].lWin;
                 } else {
-                    oMessage.innerHTML += " It's a draw!";
+                    oMessage.innerHTML = lLoc[nLang].lDraw;
+                    $("iFinalMessage").innerHTML += lLoc[nLang].lDraw;
                 }
-                if (bSound) {
-                    setTimeout(function () {
+                $("iGames1").innerHTML = nGames[0];
+                $("iGames2").innerHTML = nGames[1];
+                setTimeout(function () {
+                    nStartPlayer = 1 - nStartPlayer;
+                    bResetNeeded = true;
+                    fShowPopup($("iPopupGameOver"));
+                    if (bSound) {
                         document.getElementById("ding_sound").play();
-                    }, 500);
-                }
+                    }
+                }, 500);
             } else {
                 // nächster Spieler dran
                 nCurrentPlayer = 1 - nCurrentPlayer;
                 lPossibleMoves = fPossibleMoves(fCurrentPlayground ());
                 if (lPossibleMoves.length > 0) {
                     // nächster Spieler kann spielen
-                    oMessage.innerHTML = lStoneImg[nCurrentPlayer] +  lLoc[nLang].lTurn;
+                    oMessage.innerHTML = lStoneImg[nCurrentPlayer] + " " + cName[nCurrentPlayer] + " " + lLoc[nLang].lTurn;
                     if (cModus[nCurrentPlayer] !== "human" && cModus[nCurrentPlayer] !== "online") {
                         fAI(lPossibleMoves)
                     } else if (bShowMoves && cModus[nCurrentPlayer] === "human") {
@@ -406,7 +464,7 @@
                     if (lPossibleMoves.length > 0) {
                         // nächster Spieler kann nicht spielen und wird übersprungen
                         oMessage.innerHTML = lStoneImg[1 - nCurrentPlayer] + lLoc[nLang].lNoMove +
-                            lStoneImg[nCurrentPlayer] + lLoc[nLang].lTurn;
+                            lStoneImg[nCurrentPlayer] + " " + cName[nCurrentPlayer] + " " + lLoc[nLang].lTurn;
                         if (cModus[nCurrentPlayer] !== "human" && cModus[nCurrentPlayer] !== "online") {
                             fAI(lPossibleMoves)
                         } else if (bShowMoves && cModus[nCurrentPlayer] === "human") {
@@ -416,19 +474,34 @@
                         }
                     } else {
                         // kein Spieler kann mehr spielen, Spiel beendet
-                        oMessage.innerHTML = lLoc[nLang].lNobodyMove;
+                        $("iFinalMessage").innerHTML = lLoc[nLang].lNobodyMove;
+                        $("iPlayer1").innerHTML = lStoneImg[0] + " " + cName[0];
+                        $("iPlayer2").innerHTML = cName[1] + " " + lStoneImg[1];
+                        $("iFinalScore1").innerHTML = document.getElementsByClassName(lColor[0]).length;
+                        $("iFinalScore2").innerHTML = document.getElementsByClassName(lColor[1]).length;
                         if (document.getElementsByClassName(lColor[0]).length > document.getElementsByClassName(lColor[1]).length) {
-                            oMessage.innerHTML += lStoneImg[0] + lLoc[nLang].lWin;
+                            nGames[0] += 1;
+                            oMessage.innerHTML = lStoneImg[0] + lLoc[nLang].lWin;
+                            $("iFinalMessage").innerHTML += lStoneImg[0] + " " + cName[0] + " " + lLoc[nLang].lWin;
                         } else if (document.getElementsByClassName(lColor[0]).length < document.getElementsByClassName(lColor[1]).length) {
-                            oMessage.innerHTML += lStoneImg[1] + lLoc[nLang].lWin;
+                            nGames[1] += 1;
+                            oMessage.innerHTML = lStoneImg[1] + lLoc[nLang].lWin;
+                            $("iFinalMessage").innerHTML += lStoneImg[1] + " " + cName[1] + " " + lLoc[nLang].lWin;
                         } else {
-                            oMessage.innerHTML += lLoc[nLang].lDraw;
+                            oMessage.innerHTML = lLoc[nLang].lDraw;
+                            $("iFinalMessage").innerHTML += lLoc[nLang].lDraw;
                         }
-                        if (bSound) {
-                            setTimeout(function () {
+                        $("iGames1").innerHTML = nGames[0];
+                        $("iGames2").innerHTML = nGames[1];
+
+                        setTimeout(function () {
+                            nStartPlayer = 1 - nStartPlayer;
+                            bResetNeeded = true;
+                            fShowPopup($("iPopupGameOver"));
+                            if (bSound) {
                                 document.getElementById("ding_sound").play();
-                            }, 500);
-                        }
+                            }
+                        }, 500);
                     }
                 }
             }
@@ -693,10 +766,12 @@
         }, 1000);
     }
 
+    /**
+     * Starten eines neuen Online-Spiels
+     */
     function fOnline() {
         let oLastStart;
         let oLastQuit;
-        let nLastRound;
         fShowPopup($("iPopupOnline"));
         $("iOnline").disabled = true;
 
@@ -709,6 +784,7 @@
         });
 
         socket.on("startgame", function (data) {
+            let nWaitTime = 0;
             user = data;
             if (user.id !== oLastStart) {
                 socket.emit("usersend", {
@@ -716,28 +792,43 @@
                     name: $("iName").value
                 });
                 oLastStart = user.id;
-                //onExit = false;
-                if (cModus.length) {
-                    // ausstieg aus aktuellem Single-Player-Game
+
+                if (document.getElementsByClassName("popup-show").length) {
+                    nWaitTime += 500;
                 }
+                fHidePopup($("iPopupOnline"));
+                fHidePopup($("iPopupInfo"));
+                fHidePopup($("iPopupSettings"));
+
+                if (iGame.classList.contains("swipe-in")) {
+                    // ausstieg aus aktuellem Single-Player-Game
+                    fHidePopup($("iPopupGameOver"));
+                    fHidePopup($("iPopupLeft"));
+
+                    setTimeout(function() {
+                        iTitle.classList.remove("swipe-out");
+                        iGame.classList.remove("swipe-in");
+                        iTitle.classList.add("swipe-out-right");
+                        iGame.classList.add("swipe-in-left");
+                    }, nWaitTime);
+                    nWaitTime += 500;
+                }
+
                 if (user.role === "0") {
                     if ($("iName").value) {
-                        //p1_name = $("iName").value
+                        cName[0] = $("iName").value
                     } else {
-                        //p1_name = document.webL10n.get("lb_player1");
+                        cName[0] = lLoc[nLang].lPlayer + " 1";
                     }
-                    //p2_name = document.webL10n.get("bt_online");
+                    cName[1] = lLoc[nLang].lOnline;
                 } else {
-                    //p1_name = document.webL10n.get("bt_online");
                     if ($("iName").value) {
-                        //p2_name = $("iName").value
+                        cName[1] = $("iName").value
                     } else {
-                        //p2_name = document.webL10n.get("lb_player1");
+                        cName[1] = lLoc[nLang].lPlayer + " 1";
                     }
+                    cName[0] = lLoc[nLang].lOnline;
                 }
-                // $("P1name").innerHTML = p1_name;
-                // $("P2name").innerHTML = p2_name;
-                fHidePopup($("iPopupOnline"));
 
                 if (user.role === "0") {
                     cModus[0] = "human";
@@ -746,11 +837,16 @@
                     cModus[0] = "online";
                     cModus[1] = "human";
                 }
-                fResetGame();
-                iTitle.classList.remove("swipe-out-right");
-                iGame.classList.remove("swipe-in-left");
-                iTitle.classList.add("swipe-out");
-                iGame.classList.add("swipe-in");
+                setTimeout(function() {
+                    nStartPlayer = 0;
+                    nGames = [0, 0];
+                    fResetGame();
+                    iTitle.classList.remove("swipe-out-right");
+                    iGame.classList.remove("swipe-in-left");
+                    iTitle.classList.add("swipe-out");
+                    iGame.classList.add("swipe-in");
+                }, nWaitTime);
+
             }
         });
 
@@ -761,7 +857,6 @@
             }
             if (data.nRound === nCountRound + 1 && nLastRound !== data.nRound) {
                 nLastRound = data.nRound;
-                //fromOnline = true;
 
                 // Spielzug des Online-Gegners auf empfangenem Feld durchführen
                 setTimeout(function() {
@@ -773,13 +868,11 @@
         socket.on("userget", function (data) {
             if (user.role === "0") {
                 if (data.name.length > 0) {
-                    ///p2_name = data.name;
-                    //$("P2name").innerHTML = p2_name;
+                    cName[1] = data.name;
                 }
             } else {
                 if (data.name.length > 0) {
-                    //p1_name = data.name;
-                    //$("P1name").innerHTML = p1_name;
+                    cName[0] = data.name;
                 }
             }
         });
@@ -787,7 +880,6 @@
         socket.on("quit", function () {
             if (user.id !== oLastQuit && cModus.length &&  (cModus[0] === "online" || cModus[1] === "online" )) {
                 oLastQuit = user.id;
-                // onExit = true;
                 fShowPopup($("iPopupLeft"));
             }
         });
@@ -808,6 +900,7 @@
 
     /**
      * Popup einblenden
+     * @param {element} ePopup - Popup, welches angezeigt werden soll
      */
     function fShowPopup(ePopup) {
         $("iTitleFieldset").disabled = true;
@@ -820,6 +913,7 @@
 
     /**
      * Popup ausblenden
+     * @param {element} ePopup - Popup, welches ausgeblendet werden soll
      */
     function fHidePopup(ePopup) {
         $("iTitleFieldset").disabled = false;
@@ -827,7 +921,9 @@
         ePopup.classList.add("popup-hide");
     }
 
-    // Style setzen
+    /**
+     * Style setzen
+     */
     function fSetStyle() {
         let bLightModeOn = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
         let nStyle = parseInt($("iStyle").value);
@@ -837,6 +933,23 @@
         } else {
             document.getElementsByTagName("body")[0].classList.remove("light");
         }
+    }
+
+    /**
+     * Rotations-Animation für Titel-e
+     */
+    function  fRotateTitle() {
+        // Anzahl der animierten e's im Titel
+        const nCountE = document.getElementsByClassName("eWhite").length - 1;
+        const nCurrentE = Math.floor(Math.random() * (nCountE + 1));
+        const nTimeout = 500 + Math.floor(Math.random() * 1500);
+
+        document.getElementsByClassName("eWhite")[nCurrentE].classList.toggle("vanishWhite");
+        document.getElementsByClassName("eBlack")[nCurrentE].classList.toggle("vanish");
+
+        setTimeout(function () {
+            fRotateTitle();
+        }, nTimeout);
     }
 
     /**
@@ -854,6 +967,9 @@
         if (localStorageOK) {
             nLang = (
                 localStorage.getItem("s_reversi_lang") === null ? nLang : parseInt(localStorage.getItem("s_reversi_lang"))
+            );
+            $("iName").value = (
+                localStorage.getItem("s_reversi_name") === null ? "" : localStorage.getItem("s_reversi_name")
             );
             $("iLang").value = nLang;
             $("iStyle").value = (
@@ -901,23 +1017,8 @@
         });
 
         setTimeout(function () {
-            document.getElementsByClassName("eWhite")[1].classList.remove("vanishWhite");
-            document.getElementsByClassName("eBlack")[1].classList.add("vanish");
-        }, 1000);
-
-        setTimeout(function () {
-            document.getElementsByClassName("eWhite")[0].classList.add("vanishWhite");
-            document.getElementsByClassName("eBlack")[0].classList.remove("vanish");
+            fRotateTitle()
         }, 1500);
-        setTimeout(function () {
-            document.getElementsByClassName("eWhite")[0].classList.remove("vanishWhite");
-            document.getElementsByClassName("eBlack")[0].classList.add("vanish");
-        }, 2500);
-
-        setTimeout(function () {
-            document.getElementsByClassName("eWhite")[1].classList.add("vanishWhite");
-            document.getElementsByClassName("eBlack")[1].classList.remove("vanish");
-        }, 3000);
 
         $("iInfo").addEventListener("click", function () {
             fShowPopup($("iPopupInfo"));
@@ -935,6 +1036,7 @@
             bShowMoves = $("iShowMoves").checked;
             bSound = $("iSound").checked;
             if (localStorageOK) {
+                localStorage.setItem("s_reversi_name", $("iName").value);
                 localStorage.setItem("s_reversi_lang", nLang);
                 localStorage.setItem("s_reversi_show", bShowMoves);
                 localStorage.setItem("s_reversi_sound", bSound);
@@ -948,7 +1050,23 @@
         });
         $("iLeftClose").addEventListener("click", function () {
             fHidePopup($("iPopupLeft"));
-            fQuitGame();
+            setTimeout(function () {
+                fQuitGame();
+            }, 500);
+        });
+        $("iNo").addEventListener("click", function () {
+            fHidePopup($("iPopupGameOver"));
+            fHidePopup($("iPopupLeft"));
+            setTimeout(function () {
+                fQuitGame();
+            }, 500);
+
+        });
+        $("iYes").addEventListener("click", function () {
+            fHidePopup($("iPopupGameOver"));
+            if (bResetNeeded) {
+                fResetGame();
+            }
         });
 
         $("iLang").addEventListener("change", function() {
