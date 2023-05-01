@@ -28,7 +28,6 @@ body {
 }
 
 .page {
-    width: 100vw;
     position: fixed;
     top: 0;
     left: 0;
@@ -48,7 +47,6 @@ header .title1 {
     max-height: calc(100vh - 280px);
     min-height: 55px;
     max-width: calc((100vh - 280px) / 9 * 49);
-    min-width: calc(55px / 9 * 49);
 }
 
 .eBlack, .eWhite {
@@ -80,8 +78,11 @@ fieldset {
     border: none;
 }
 
-.content {
+#iTitleFieldset {
     margin: 5px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 10px);
 }
 
 #iGame {
@@ -579,6 +580,7 @@ nav, .mini-buttonlist, .close-button {
 #iPlayground {
     width: 100vmin;
     height: 100vmin;
+    max-height: 100%;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(8, 1fr);
@@ -629,6 +631,9 @@ nav, .mini-buttonlist, .close-button {
 }
 
 @media screen and (orientation: landscape) {
+    header .title1 {
+        min-width: calc(55px / 9 * 49);
+    }
     nav {
         flex-direction: row;
     }
@@ -692,13 +697,13 @@ nav, .mini-buttonlist, .close-button {
     nav {
         flex-direction: column;
         align-items: stretch;
+        flex-grow: 1;
     }
     .list-button {
-        max-height: calc(23vh - 17px - 5.5vw);
         padding: 1px 0 1px 0;
         display: flex;
         align-items: center;
-        width: 100%;
+        flex-grow: 1;
     }
     .list-button:first-child {
         border-top-left-radius: 10px;
@@ -714,9 +719,12 @@ nav, .mini-buttonlist, .close-button {
         pointer-events: none;
     }
     .button-img {
-        margin: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
         pointer-events: none;
+        height: calc(80% - 10px);
         max-height: calc(23vh - 47px - 5.5vw);
+        max-width: 30vw;
     }
     .list-button:active > .button-img {
         margin-top: 22px;
