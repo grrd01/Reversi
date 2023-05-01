@@ -98,7 +98,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     src: 'index.html',
-                    dest: 'dist/Reversi'
+                    dest: 'dist'
                 }]
             }
         },
