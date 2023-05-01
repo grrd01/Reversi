@@ -1,9 +1,0 @@
-/**
- * grrd's Reversi
- * Copyright (c) 2022 Gerard Tyedmers, grrd@gmx.net
- * @license MPL-2.0
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-const CACHE_NAME="grrds-Reversi-cache",CACHE_VERSION="v2.1",CACHE=CACHE_NAME+"-v2.1",urlsToCache=["index.html","images/2online.svg","images/2player.svg","images/4inarow.svg","images/bulp.svg","images/design.svg","images/dice.svg","images/down.svg","images/easy.svg","images/hard.svg","images/icon.svg","images/icon_ios.png","images/info.svg","images/language.svg","images/mail.svg","images/medium.svg","images/memo.svg","images/ok.svg","images/player.svg","images/puzzle.svg","images/settings.svg","images/sound_on.svg","images/stone_black.svg","images/stone_empty.svg","images/stone_white.svg","images/tictactoe.svg","images/x.svg","scripts/app.js","styles/app.css"];self.addEventListener("install",(function(e){"use strict";e.waitUntil(caches.open(CACHE).then((function(e){return console.log("Opened cache"),e.addAll(urlsToCache)})))})),self.addEventListener("fetch",(function(e){"use strict";e.respondWith(caches.match(e.request).then((function(s){if(s)return s;const i=e.request.clone();return fetch(i).then((function(s){if(!s||200!==s.status||"basic"!==s.type)return s;const i=s.clone();return caches.open(CACHE).then((function(s){s.put(e.request,i)})),s}))})))})),self.addEventListener("activate",(function(e){"use strict";e.waitUntil(caches.keys().then((function(e){return Promise.all(e.map((function(e){if(0===e.indexOf(CACHE_NAME)&&-1===e.indexOf("v2.1"))return console.log(e+" deleted"),caches.delete(e)})))})))}));
