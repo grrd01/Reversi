@@ -52,8 +52,10 @@
     }
 
     // Get newest Cert and Key-File on server
-    var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^grrd_a2hosted_com_.*.crt$"));
-    var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(43, 54) + ".*.key$"));
+    var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^cpanel_grrd_a2hosted_com_.*.crt$"));
+    var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(50, 61) + ".*.key$"));
+    //var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^grrd_a2hosted_com_.*.crt$"));
+    //var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(43, 54) + ".*.key$"));
 
     var options = {
         key: fs.readFileSync(key),
