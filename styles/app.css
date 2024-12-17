@@ -727,8 +727,8 @@ nav, .mini-buttonlist, .close-button {
         max-width: 30vw;
     }
     .list-button:active > .button-img {
-        margin-top: 22px;
-        margin-bottom: 18px;
+        margin-top: 2px;
+        margin-bottom: -2px;
     }
     .list-button:active > span {
         padding-top: 4px;
