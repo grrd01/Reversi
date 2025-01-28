@@ -53,10 +53,18 @@ header .title1 {
     transform-box: fill-box;
     transform-origin: center;
     transition: all 0.3s ease-in-out;
+    stroke-width:4;
+}
+
+.eBlack {
+    fill:#000;
+    stroke: url(#eBlack);
 }
 
 .eWhite {
     transform: rotate(180deg);
+    fill: #fff;
+    stroke: url(#eWhite);
 }
 
 .vanish {
@@ -83,6 +91,11 @@ fieldset {
     display: flex;
     flex-direction: column;
     height: calc(100% - 10px);
+}
+
+svg {
+    stroke-linecap: round;
+    stroke-linejoin: round
 }
 
 #iGame {
@@ -386,6 +399,17 @@ nav, .mini-buttonlist, .close-button {
     padding-top: 20px;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+.cScore1 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.cScore {
+    display: flex;
+    justify-content: space-around;
 }
 
 @supports (-webkit-overflow-scrolling: touch) {
