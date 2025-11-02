@@ -775,8 +775,8 @@
         fShowPopup($("iPopupOnline"));
         $("iOnline").disabled = true;
 
-        //socket = io.connect("http://localhost:49153", {"forceNew": true});
-        socket = io.connect("https://grrd.a2hosted.com:49153", {"forceNew": true});
+        //socket = io.connect("http://localhost:4000", {"forceNew": true});
+        socket = io.connect("https://grrd.duckdns.org:4000", {"forceNew": true});
 
         socket.heartbeatTimeout = 20000;
         socket.on("connect", function () {
