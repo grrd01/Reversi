@@ -17,6 +17,7 @@
  * - see running node-apps: pm2 list
  *
  * Useful Paths:
+ * - /srv/reversi/reversi_server.js - Node-Script
  * - /etc/nginx/sites-available/default - WebServer-Config
  * - /var/www/html - WebServer Root-Verzeichnis
  * - /etc/letsencrypt/live/grrd.duckdns.org - letsencrypt-Zertifikate
