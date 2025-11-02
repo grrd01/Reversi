@@ -7,12 +7,19 @@
  * - Install node (https://nodejs.org/en/)
  * - Install dependencies: npm install (in the path where package.json is)
  * - Start the application: node reversi_server.js (in the path where reversi_server.js is)
+ * - Start in background (Linux): nohup node reversi_server.js &
  *
  * Useful Commands:
  * - get Version of Node: node -v
  * - get Version of NPM: npm -v
  * - get installed Packages: npm ls --depth=0
  * - set debug level: set DEBUG=*
+ * - see running node-apps: pm2 list
+ *
+ * Useful Paths:
+ * - /etc/nginx/sites-available/default - WebServer-Config
+ * - /var/www/html - WebServer Root-Verzeichnis
+ * - /etc/letsencrypt/live/grrd.duckdns.org - letsencrypt-Zertifikate
  */
 
 /*jslint browser:true, for:true */ /*global  require __dirname */
@@ -22,44 +29,9 @@
 
     var fs = require("fs");
 
-    function getNewestFile(dir, regexp) {
-        var path = require("path");
-        var newest = null;
-        var files = fs.readdirSync(dir);
-        var i;
-        var f_time;
-        var newest_time;
-
-        for (i = 0; i < files.length; i += 1) {
-            if (regexp.test(files[i])) {
-                if (newest === null) {
-                    newest = files[i];
-                    newest_time = fs.statSync(path.join(dir, newest)).mtime.getTime();
-                } else {
-                    f_time = fs.statSync(path.join(dir, files[i])).mtime.getTime();
-                    if (f_time > newest_time) {
-                        newest = files[i];
-                        newest_time = f_time;
-                    }
-                }
-            }
-        }
-
-        if (newest !== null) {
-            return (path.join(dir, newest));
-        }
-        return null;
-    }
-
-    // Get newest Cert and Key-File on server
-    var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^cpanel_grrd_a2hosted_com_.*.crt$"));
-    var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(50, 61) + ".*.key$"));
-    //var cert = getNewestFile("/home/grrdahos/ssl/certs", new RegExp("^grrd_a2hosted_com_.*.crt$"));
-    //var key = getNewestFile("/home/grrdahos/ssl/keys", new RegExp("^" + cert.substring(43, 54) + ".*.key$"));
-
     var options = {
-        key: fs.readFileSync(key),
-        cert: fs.readFileSync(cert)
+        key: fs.readFileSync("/etc/letsencrypt/live/grrd.duckdns.org/privkey.pem"),
+        cert: fs.readFileSync("/etc/letsencrypt/live/grrd.duckdns.org/fullchain.pem")
     };
 
     function handler(ignore, res) {
@@ -85,7 +57,7 @@
 
     var io = require("socket.io").listen(app);
     var Moniker = require("moniker");
-    app.listen(49153);
+    app.listen(4000);
 
     var users = [];
 
