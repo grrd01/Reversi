@@ -28,9 +28,9 @@
 (function () {
     "use strict";
 
-    var fs = require("fs");
+    const fs = require("fs");
 
-    var options = {
+    const options = {
         key: fs.readFileSync("/etc/letsencrypt/live/grrd.duckdns.org/privkey.pem"),
         cert: fs.readFileSync("/etc/letsencrypt/live/grrd.duckdns.org/fullchain.pem")
     };
@@ -51,23 +51,26 @@
     }
 
     // Start App on Server:
-    var app = require("https").createServer(options, handler);
+    const app = require("https").createServer(options, handler);
 
     // Start App on LocalHost:
-    //var app = require("http").createServer(handler);
+    //const app = require("http").createServer(handler);
 
-    var io = require("socket.io").listen(app);
-    var Moniker = require("moniker");
+    const io = require("socket.io")(app, {
+        cors: {
+            origin: "*"
+        }
+    });
+    const Moniker = require("moniker");
     app.listen(4000);
 
-    var users = [];
+    const users = [];
 
-    var startgame = function () {
-        var i;
-        for (i = 0; i < users.length; i += 1) {
+    const startgame = function () {
+        for (let i = 0; i < users.length; i += 1) {
             if (i === users.length - 1) {
                 // kein freier Gegner
-                io.to(users[i].id).emit("connect", users[i]);
+                io.to(users[i].id).emit("waiting");
             } else {
                 // Gegner vorhanden
                 if (users[i].opponent === null) {
@@ -83,8 +86,8 @@
         }
     };
 
-    var addUser = function (socket) {
-        var user = {
+    const addUser = function (socket) {
+        const user = {
             name: Moniker.choose(),
             id: socket.id,
             role: null,
@@ -95,9 +98,8 @@
         return user;
     };
 
-    var removeUser = function (user) {
-        var i;
-        for (i = 0; i < users.length; i += 1) {
+    const removeUser = function (user) {
+        for (let i = 0; i < users.length; i += 1) {
             if (user.name === users[i].name) {
                 users.splice(i, 1);
                 return;
@@ -106,7 +108,7 @@
     };
 
     io.on("connection", function (socket) {
-        var user = addUser(socket);
+        const user = addUser(socket);
 
         socket.on("disconnect", function () {
             if (user.opponent !== null) {

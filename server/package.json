@@ -1,6 +1,6 @@
 {
   "name": "grrdsReversi",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "grrd's Reversi - Online version",
   "author": {
     "name": "Gerard Tyedmers",
@@ -13,14 +13,14 @@
     "url": "https://github.com/grrd01/Reversi.git"
   },
   "engines": {
-    "node": "6.11.0",
-    "npm": "3.10.10"
+    "node": ">=10.2.0",
+    "npm": ">=6"
   },
   "scripts": {
     "start": "./reversi_server.js"
   },
   "dependencies": {
-    "socket.io": "1.7.4",
+    "socket.io": "4.8.3",
     "moniker": "0.1.2"
   }
 }
